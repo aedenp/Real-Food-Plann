@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Real Meal Plan | Calendar Planner</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <a href="index.html" class="nav-link">Weekly Randomizer</a>
+    <a href="calendar.html" class="nav-link active">Calendar Planner</a>
+  </nav>
+
+  <div class="title-card">
+    <div class="logo-area">
+      <img src="your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
+      <h1>Meal Calendar</h1>
+    </div>
+    <p class="tagline">Plan your dinners for any date — past, present, or future</p>
+  </div>
+
+  <!-- Calendar Controls -->
+  <div class="calendar-controls">
+    <div class="month-nav">
+      <button class="btn btn-secondary btn-small" id="prevMonthBtn">← Prev</button>
+      <h2 id="currentMonthDisplay">April 2026</h2>
+      <button class="btn btn-secondary btn-small" id="nextMonthBtn">Next →</button>
+    </div>
+    <div class="calendar-actions">
+      <button class="btn btn-secondary btn-small" id="todayBtn">Today</button>
+      <button class="btn btn-secondary btn-small" id="selectModeToggle">🔘 Select Mode</button>
+      <button class="btn btn-secondary btn-small" id="deleteSelectedBtn" disabled>🗑️ Delete Selected</button>
+      <button class="btn btn-secondary btn-small" id="clearAllCalendarBtn">🧹 Clear All</button>
+      <button class="btn btn-secondary btn-small" id="groceryForWeekBtn">🛒 Grocery for Selected</button>
+    </div>
+  </div>
+
+  <!-- Selection status bar -->
+  <div class="selection-status" id="selectionStatus" style="display: none;">
+    <span id="selectedCount">0</span> day(s) selected.
+    <button class="btn-text" id="clearSelectionBtn">Clear selection</button>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="calendar-wrapper">
+    <div class="calendar-header">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+      <!-- Days injected via JS -->
+    </div>
+  </div>
+
+  <!-- Day Detail Panel -->
+  <div class="day-detail-panel" id="dayDetailPanel">
+    <div class="day-detail-header">
+      <h3 id="selectedDateDisplay">Select a date</h3>
+      <button class="recipe-close-btn" id="closeDayDetailBtn">&times;</button>
+    </div>
+    <div class="day-detail-content" id="dayDetailContent">
+      <div class="meal-form">
+        <label>Main Dish:</label>
+        <select id="mainSelect" class="meal-select">
+          <option value="">— Select Main —</option>
+        </select>
+        <label>Side:</label>
+        <select id="sideSelect" class="meal-select">
+          <option value="">— Select Side —</option>
+        </select>
+        <label>Vegetable:</label>
+        <select id="vegSelect" class="meal-select">
+          <option value="">— Select Vegetable —</option>
+        </select>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-small" id="saveMealBtn">Save Meal</button>
+          <button class="btn btn-secondary btn-small" id="clearMealBtn">Clear</button>
+        </div>
+      </div>
+      <div class="random-week-section">
+        <p>Or quickly fill a week starting from this date (through Saturday):</p>
+        <button class="btn btn-secondary" id="fillWeekBtn">🎲 Random Fill Week</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recipe Panel -->
+  <div class="recipe-panel" id="recipePanel">
+    <div class="recipe-header">
+      <h3 id="recipeTitle">Recipe</h3>
+      <button class="recipe-close-btn" id="closeRecipeBtn">&times;</button>
+    </div>
+    <div class="recipe-content" id="recipeContent">
+      Select a dish above to view its recipe.
+    </div>
+  </div>
+
+  <!-- Grocery List Section (collapsible) -->
+  <div class="grocery-section">
+    <button class="grocery-toggle-btn" id="groceryToggleBtn">
+      <span class="toggle-icon">🛒</span> Grocery List <span id="groceryItemCount" class="grocery-count">0</span>
+    </button>
+    <div class="grocery-panel" id="groceryPanel">
+      <div class="grocery-header">
+        <h3>Shopping List</h3>
+      </div>
+      <div class="grocery-list-container" id="groceryListContainer">
+        <div id="groceryCategoriesContainer">
+          <!-- Categories and items injected here -->
+        </div>
+      </div>
+      <div class="grocery-footer">
+        <button class="btn btn-secondary" id="clearGroceryBtn">Clear List</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>Click any date to view or edit dinner plans. Changes are saved automatically in your browser.</footer>
+</div>
+
+<script src="calendar.js"></script>
+</body>
+</html>

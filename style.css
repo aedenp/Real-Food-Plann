@@ -22,6 +22,35 @@ body {
   border: 1px solid #b3d9a8;
 }
 
+/* Navigation */
+.main-nav {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #cde2c4;
+  padding-bottom: 0.8rem;
+}
+
+.nav-link {
+  text-decoration: none;
+  font-weight: 600;
+  color: #4a7c5c;
+  padding: 0.5rem 1.2rem;
+  border-radius: 60px;
+  transition: all 0.2s;
+  background: transparent;
+}
+
+.nav-link:hover {
+  background: #e9f3e4;
+  color: #2b6e3c;
+}
+
+.nav-link.active {
+  background: #4c8c4a;
+  color: white;
+}
+
 /* Title Card */
 .title-card {
   text-align: center;
@@ -240,6 +269,11 @@ h1 {
   transform: translateY(-1px);
 }
 
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .feedback {
   background: #eef4eb;
   border-radius: 60px;
@@ -351,6 +385,21 @@ h1 {
   accent-color: #6fbf4c;
   cursor: pointer;
   margin: 0;
+}
+
+/* Save to Calendar Section */
+.save-calendar-section {
+  margin-top: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.save-calendar-note {
+  color: #2b6e3c;
+  font-size: 0.85rem;
+  font-style: italic;
 }
 
 /* Recipe Panel */
@@ -590,6 +639,274 @@ h1 {
   font-style: italic;
 }
 
+/* Calendar Styles */
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.month-nav {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.month-nav h2 {
+  color: #2b6e3c;
+  font-size: 1.5rem;
+  margin: 0;
+  min-width: 200px;
+  text-align: center;
+}
+
+.calendar-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.selection-status {
+  background: #e9f3e4;
+  border-radius: 40px;
+  padding: 0.5rem 1.5rem;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #2b6e3c;
+  font-size: 0.9rem;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #4c8c4a;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+  font-size: 0.85rem;
+}
+
+.btn-text:hover {
+  color: #2b6e3c;
+}
+
+.calendar-wrapper {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 1rem;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+  border: 1px solid #c8e0bf;
+  margin-bottom: 2rem;
+}
+
+.calendar-header {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-weight: 600;
+  color: #2b6e3c;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #cde2c4;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+}
+
+.calendar-day {
+  aspect-ratio: 1 / 1.2;
+  min-height: 85px;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: #fafef8;
+  border: 1px solid #e2eedd;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  flex-direction: column;
+}
+
+.calendar-day:hover {
+  background: #e9f3e4;
+  border-color: #8fcb7a;
+}
+
+.calendar-day.other-month {
+  opacity: 0.5;
+  background: #f4f4f0;
+}
+
+.calendar-day.today {
+  border: 2px solid #4c8c4a;
+}
+
+.calendar-day.has-meal {
+  background: #dcfce7;
+}
+
+.calendar-day.selected {
+  border: 3px solid #4c8c4a;
+  box-shadow: 0 0 0 2px rgba(76, 140, 74, 0.2);
+}
+
+.day-number {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #2b6e3c;
+  margin-bottom: 0.2rem;
+}
+
+.day-meal-preview {
+  font-size: 0.6rem;
+  line-height: 1.2;
+  color: #3c723a;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+.day-meal-preview span {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Day Detail Panel */
+.day-detail-panel {
+  margin-top: 1.5rem;
+  background: #f8fcf6;
+  border-radius: 1.5rem;
+  border: 1px solid #c8e0bf;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  display: none;
+}
+
+.day-detail-panel.show {
+  display: block;
+}
+
+.day-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.8rem;
+  background: #e9f3e4;
+  border-bottom: 1px solid #cde2c4;
+}
+
+.day-detail-header h3 {
+  color: #2b6e3c;
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.day-detail-content {
+  padding: 1.5rem 1.8rem;
+}
+
+.meal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.meal-form label {
+  font-weight: 600;
+  color: #2b6e3c;
+  margin-bottom: -0.5rem;
+}
+
+.meal-select {
+  padding: 0.6rem 1rem;
+  border-radius: 40px;
+  border: 1px solid #bcd9b2;
+  background: white;
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: #1e3a2f;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.random-week-section {
+  border-top: 1px solid #cde2c4;
+  padding-top: 1.5rem;
+}
+
+.random-week-section p {
+  margin-bottom: 1rem;
+  color: #4a7c5c;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 2rem;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+}
+
+.modal-content h3 {
+  color: #2b6e3c;
+  margin-bottom: 1.5rem;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  border-radius: 60px;
+  border: 1px solid #bcd9b2;
+  font-family: inherit;
+  margin-bottom: 1.5rem;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+/* Select mode active indicator */
+#selectModeToggle.active {
+  background: #4c8c4a;
+  color: white;
+  border-color: #3c723a;
+}
+
 footer {
   margin-top: 2rem;
   font-size: 0.7rem;
@@ -604,6 +921,12 @@ footer {
   }
   .week-table {
     font-size: 0.75rem;
+  }
+  .calendar-day {
+    padding: 0.2rem;
+  }
+  .day-meal-preview {
+    font-size: 0.5rem;
   }
 }
 
@@ -631,5 +954,9 @@ footer {
   }
   .grocery-item-actions {
     align-self: flex-end;
+  }
+  .month-nav {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }

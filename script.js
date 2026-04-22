@@ -71,7 +71,6 @@ function addRecipes(dishes, category, ingredientGenerator) {
   });
 }
 
-// Ingredient generators for each category
 function mainIngredients(dishName) {
   if (dishName.includes("Chicken")) return [
     { name: "Chicken breast", quantity: "1.5 lbs" },
@@ -275,27 +274,15 @@ function vegIngredients(vegName) {
   return [{ name: "Vegetable", quantity: "1 bunch" }];
 }
 
-// Populate RECIPES
 addRecipes(MAIN_DISHES, 'Main Dish', mainIngredients);
 addRecipes(SIDES, 'Side', sideIngredients);
 addRecipes(VEGETABLES, 'Vegetable', vegIngredients);
 
-// Instructions are simple for demo
-Object.keys(RECIPES).forEach(name => {
-  if (!RECIPES[name].instructions) {
-    RECIPES[name].instructions = `1. Prepare ingredients.\n2. Cook ${name}.\n3. Serve.`;
-  }
-});
-
 function getRecipeText(dishName) {
   const recipe = RECIPES[dishName];
   if (!recipe) return `Recipe for "${dishName}" is not yet available.`;
-  
-  let text = `📋 **${dishName}** (${recipe.category})\n\n`;
-  text += `**Ingredients:**\n`;
-  recipe.ingredients.forEach(ing => {
-    text += `- ${ing.quantity} ${ing.name}\n`;
-  });
+  let text = `📋 **${dishName}** (${recipe.category})\n\n**Ingredients:**\n`;
+  recipe.ingredients.forEach(ing => text += `- ${ing.quantity} ${ing.name}\n`);
   text += `\n**Instructions:**\n${recipe.instructions}`;
   return text;
 }
@@ -321,13 +308,11 @@ function getCategory(ingredientName) {
   return 'Other';
 }
 
-// Parse quantity string like "1.5 lbs" into { value: 1.5, unit: "lbs" }
 function parseQuantity(qtyStr) {
   const match = qtyStr.match(/^([\d./]+)\s*([a-zA-Z]*)$/);
   if (!match) return null;
   let value = match[1];
   const unit = match[2] || '';
-  // Handle fractions like "1/2"
   if (value.includes('/')) {
     const parts = value.split('/');
     if (parts.length === 2) {
@@ -341,26 +326,9 @@ function parseQuantity(qtyStr) {
   return isNaN(value) ? null : { value, unit: unit.trim() };
 }
 
-// Format combined quantity
 function formatQuantity(value, unit) {
-  // Round to 2 decimals if needed
   const rounded = Math.round(value * 100) / 100;
   return `${rounded} ${unit}`.trim();
-}
-
-// Combine quantities for same unit
-function combineQuantities(existing, newQty) {
-  const parsedExisting = parseQuantity(existing);
-  const parsedNew = parseQuantity(newQty);
-  if (!parsedExisting || !parsedNew) return existing; // fallback to string concat? we'll just return existing and add note
-  
-  if (parsedExisting.unit === parsedNew.unit) {
-    const total = parsedExisting.value + parsedNew.value;
-    return formatQuantity(total, parsedExisting.unit);
-  }
-  // Different units - keep separate by returning a combined string? Actually we'll just keep as separate entries.
-  // But here we return existing (won't combine)
-  return existing;
 }
 
 // --------------------------------------------------------------
@@ -376,7 +344,7 @@ let dayCells = { main: [], side: [], veg: [] };
 let blockerCheckboxes = [];
 
 // Grocery state
-let currentGroceryItems = []; // array of { id, name, quantity, category }
+let currentGroceryItems = [];
 
 // DOM elements
 const generateBtn = document.getElementById("generateBtn");
@@ -431,7 +399,7 @@ groceryToggleBtn.addEventListener('click', () => {
 });
 
 function generateGroceryList() {
-  const ingredientMap = new Map(); // key: name_lower|unit -> { name, quantity, unit, category }
+  const ingredientMap = new Map();
   
   weeklyPlan.forEach((meal) => {
     if (!meal) return;
@@ -446,11 +414,9 @@ function generateGroceryList() {
       if (!recipe) return;
       recipe.ingredients.forEach(ing => {
         const parsed = parseQuantity(ing.quantity);
-        if (!parsed) return; // skip unparseable for now
-        
+        if (!parsed) return;
         const unit = parsed.unit;
         const key = `${ing.name.toLowerCase()}|${unit}`;
-        
         if (ingredientMap.has(key)) {
           const existing = ingredientMap.get(key);
           existing.quantityValue += parsed.value;
@@ -484,7 +450,6 @@ function renderGroceryList() {
     return;
   }
   
-  // Group by category
   const categories = {};
   currentGroceryItems.forEach(item => {
     if (!categories[item.category]) categories[item.category] = [];
@@ -515,7 +480,6 @@ function renderGroceryList() {
       html += `</ul></div>`;
     }
   }
-  // Handle any remaining categories not in order
   Object.keys(categories).forEach(cat => {
     if (!categoryOrder.includes(cat) && categories[cat].length > 0) {
       html += `<div class="grocery-category">`;
@@ -541,7 +505,6 @@ function renderGroceryList() {
   groceryCategoriesContainer.innerHTML = html;
   groceryItemCount.textContent = currentGroceryItems.length;
   
-  // Attach event listeners
   document.querySelectorAll('.grocery-remove-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       const id = btn.dataset.id;
@@ -854,6 +817,134 @@ function generateAndFillNextDay() {
   }
   return true;
 }
+
+// --------------------------------------------------------------
+// SAVE WEEK TO CALENDAR FUNCTIONALITY
+// --------------------------------------------------------------
+const saveWeekToCalendarBtn = document.getElementById('saveWeekToCalendarBtn');
+const saveCalendarNote = document.getElementById('saveCalendarNote');
+
+function formatDateForStorage(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function getLastSavedWeekStart() {
+  const saved = localStorage.getItem('realMealPlan_lastSavedWeekStart');
+  if (saved) return new Date(saved + 'T12:00:00');
+  return null;
+}
+
+function setLastSavedWeekStart(date) {
+  localStorage.setItem('realMealPlan_lastSavedWeekStart', formatDateForStorage(date));
+}
+
+function getNextMondayAfter(date) {
+  const nextMonday = new Date(date);
+  const daysUntilMonday = (8 - date.getDay()) % 7 || 7;
+  nextMonday.setDate(date.getDate() + daysUntilMonday);
+  return nextMonday;
+}
+
+function getSuggestedStartDate() {
+  const lastStart = getLastSavedWeekStart();
+  if (lastStart) {
+    return getNextMondayAfter(lastStart);
+  } else {
+    const today = new Date();
+    return getNextMondayAfter(today);
+  }
+}
+
+function showDatePickerModal(callback) {
+  const defaultDate = getSuggestedStartDate();
+  const defaultStr = formatDateForStorage(defaultDate);
+  
+  const modalHtml = `
+    <div class="modal-overlay" id="datePickerModal">
+      <div class="modal-content">
+        <h3>Choose Start Date for This Week</h3>
+        <p style="margin-bottom:0.5rem; color:#4a7c5c;">Monday will be this date, Tuesday the next day, etc.</p>
+        <input type="date" id="startDateInput" value="${defaultStr}">
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
+          <button class="btn btn-primary" id="confirmModalBtn">Save</button>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.body.insertAdjacentHTML('beforeend', modalHtml);
+  const modal = document.getElementById('datePickerModal');
+  const input = document.getElementById('startDateInput');
+  const cancelBtn = document.getElementById('cancelModalBtn');
+  const confirmBtn = document.getElementById('confirmModalBtn');
+  
+  const closeModal = () => modal.remove();
+  
+  cancelBtn.addEventListener('click', closeModal);
+  confirmBtn.addEventListener('click', () => {
+    const selectedDate = new Date(input.value + 'T12:00:00');
+    closeModal();
+    callback(selectedDate);
+  });
+  
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+  });
+}
+
+function saveWeekToCalendar(startDate) {
+  const calendarData = JSON.parse(localStorage.getItem('realMealPlan_calendar')) || {};
+  
+  let savedCount = 0;
+  for (let i = 0; i < WEEKDAYS.length; i++) {
+    const meal = weeklyPlan[i];
+    if (!meal) continue;
+    
+    const date = new Date(startDate);
+    date.setDate(startDate.getDate() + i);
+    const dateStr = formatDateForStorage(date);
+    
+    const mainDish = meal.main === "[Blocked]" ? "" : meal.main;
+    const sideDish = meal.side === "[Blocked]" ? "" : meal.side;
+    const vegDish = meal.veg === "[Blocked]" ? "" : meal.veg;
+    
+    if (mainDish || sideDish || vegDish) {
+      calendarData[dateStr] = {
+        main: mainDish,
+        side: sideDish,
+        veg: vegDish
+      };
+      savedCount++;
+    } else {
+      delete calendarData[dateStr];
+    }
+  }
+  
+  localStorage.setItem('realMealPlan_calendar', JSON.stringify(calendarData));
+  setLastSavedWeekStart(startDate);
+  return savedCount;
+}
+
+saveWeekToCalendarBtn.addEventListener('click', () => {
+  const hasAnyMeal = weeklyPlan.some(meal => meal !== null);
+  if (!hasAnyMeal) {
+    saveCalendarNote.textContent = 'No meals planned yet. Generate a week first!';
+    saveCalendarNote.style.color = '#b91c1c';
+    setTimeout(() => saveCalendarNote.textContent = '', 3000);
+    return;
+  }
+  
+  showDatePickerModal((startDate) => {
+    const count = saveWeekToCalendar(startDate);
+    saveCalendarNote.textContent = `Saved ${count} days to calendar starting ${startDate.toLocaleDateString()}.`;
+    saveCalendarNote.style.color = '#166534';
+    setTimeout(() => saveCalendarNote.textContent = '', 4000);
+  });
+});
 
 // --------------------------------------------------------------
 // EVENT BINDING & INIT
