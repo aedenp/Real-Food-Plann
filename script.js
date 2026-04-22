@@ -53,33 +53,346 @@ const VEGETABLES = [
   { name: "Maple Dill Carrots", vegTypes: ["carrots"] }
 ];
 
+// --------------------------------------------------------------
+// RECIPE DATABASE (with fictional ingredients)
+// --------------------------------------------------------------
+const RECIPES = {};
+
+function createRecipe(name, category, ingredients, instructions) {
+  RECIPES[name] = { category, ingredients, instructions };
+}
+
+function addRecipes(dishes, category, ingredientGenerator) {
+  dishes.forEach(dish => {
+    const dishName = typeof dish === 'string' ? dish : dish.name;
+    const ingredients = ingredientGenerator(dishName);
+    const instructions = `1. Prepare all ingredients.\n2. Cook ${dishName} according to standard method.\n3. Serve hot and enjoy!`;
+    createRecipe(dishName, category, ingredients, instructions);
+  });
+}
+
+// Ingredient generators for each category
+function mainIngredients(dishName) {
+  if (dishName.includes("Chicken")) return [
+    { name: "Chicken breast", quantity: "1.5 lbs" },
+    { name: "Olive oil", quantity: "2 tbsp" },
+    { name: "Garlic cloves", quantity: "3" },
+    { name: "Lemon", quantity: "1" },
+    { name: "Fresh herbs (rosemary/thyme)", quantity: "2 sprigs" }
+  ];
+  if (dishName.includes("Beef")) return [
+    { name: "Beef (sirloin/ground)", quantity: "1 lb" },
+    { name: "Onion", quantity: "1 medium" },
+    { name: "Worcestershire sauce", quantity: "1 tbsp" },
+    { name: "Black pepper", quantity: "1 tsp" }
+  ];
+  if (dishName.includes("Pork")) return [
+    { name: "Pork chops/ribs", quantity: "1.5 lbs" },
+    { name: "BBQ sauce", quantity: "1/2 cup" },
+    { name: "Brown sugar", quantity: "2 tbsp" },
+    { name: "Paprika", quantity: "1 tsp" }
+  ];
+  if (dishName.includes("Salmon") || dishName.includes("Shrimp") || dishName.includes("Cod")) return [
+    { name: "Salmon fillet", quantity: "1 lb" },
+    { name: "Butter", quantity: "2 tbsp" },
+    { name: "Lemon juice", quantity: "2 tbsp" },
+    { name: "Dill", quantity: "1 tbsp chopped" }
+  ];
+  if (dishName.includes("Fajita")) return [
+    { name: "Chicken breast", quantity: "0.75 lb" },
+    { name: "Beef strips", quantity: "0.75 lb" },
+    { name: "Bell peppers", quantity: "2" },
+    { name: "Onion", quantity: "1 large" },
+    { name: "Fajita seasoning", quantity: "2 tbsp" }
+  ];
+  if (dishName.includes("Pizza")) return [
+    { name: "Pizza dough", quantity: "1 ball" },
+    { name: "Tomato sauce", quantity: "1/2 cup" },
+    { name: "Mozzarella cheese", quantity: "2 cups shredded" },
+    { name: "Pepperoni", quantity: "1/2 cup" },
+    { name: "Italian seasoning", quantity: "1 tsp" }
+  ];
+  if (dishName.includes("Surf & Turf")) return [
+    { name: "Beef tenderloin", quantity: "8 oz" },
+    { name: "Shrimp", quantity: "6 large" },
+    { name: "Butter", quantity: "3 tbsp" },
+    { name: "Garlic", quantity: "2 cloves" }
+  ];
+  if (dishName.includes("Mixed Grill")) return [
+    { name: "Chicken thighs", quantity: "2" },
+    { name: "Pork sausage", quantity: "2 links" },
+    { name: "Beef steak", quantity: "8 oz" },
+    { name: "BBQ rub", quantity: "2 tbsp" }
+  ];
+  if (dishName.includes("Jambalaya")) return [
+    { name: "Chicken thighs", quantity: "0.5 lb" },
+    { name: "Shrimp", quantity: "0.5 lb" },
+    { name: "Andouille sausage", quantity: "0.5 lb" },
+    { name: "Rice", quantity: "1 cup" },
+    { name: "Creole seasoning", quantity: "1 tbsp" }
+  ];
+  if (dishName.includes("Dumplings")) return [
+    { name: "Ground pork", quantity: "0.5 lb" },
+    { name: "Shrimp", quantity: "0.25 lb chopped" },
+    { name: "Dumpling wrappers", quantity: "20 pieces" },
+    { name: "Soy sauce", quantity: "2 tbsp" },
+    { name: "Ginger", quantity: "1 tsp grated" }
+  ];
+  return [{ name: "Main ingredient", quantity: "1 unit" }];
+}
+
+function sideIngredients(sideName) {
+  if (sideName.includes("Rice")) return [
+    { name: "Jasmine rice", quantity: "1 cup" },
+    { name: "Water", quantity: "2 cups" },
+    { name: "Salt", quantity: "1/2 tsp" }
+  ];
+  if (sideName.includes("Mashed Potatoes")) return [
+    { name: "Potatoes", quantity: "2 lbs" },
+    { name: "Butter", quantity: "4 tbsp" },
+    { name: "Milk", quantity: "1/2 cup" },
+    { name: "Garlic", quantity: "2 cloves" }
+  ];
+  if (sideName.includes("Sweet Potato Fries")) return [
+    { name: "Sweet potatoes", quantity: "2 large" },
+    { name: "Olive oil", quantity: "2 tbsp" },
+    { name: "Paprika", quantity: "1 tsp" },
+    { name: "Salt", quantity: "1/2 tsp" }
+  ];
+  if (sideName.includes("Dinner Roll")) return [
+    { name: "Dinner rolls", quantity: "4 pieces" },
+    { name: "Butter", quantity: "2 tbsp" }
+  ];
+  if (sideName.includes("Garlic Noodles")) return [
+    { name: "Egg noodles", quantity: "8 oz" },
+    { name: "Butter", quantity: "3 tbsp" },
+    { name: "Garlic", quantity: "4 cloves minced" },
+    { name: "Parmesan cheese", quantity: "1/4 cup" }
+  ];
+  if (sideName.includes("Corn on the Cob")) return [
+    { name: "Corn ears", quantity: "4" },
+    { name: "Butter", quantity: "2 tbsp" },
+    { name: "Salt", quantity: "to taste" }
+  ];
+  if (sideName.includes("Garden Salad")) return [
+    { name: "Mixed greens", quantity: "4 cups" },
+    { name: "Cherry tomatoes", quantity: "1 cup" },
+    { name: "Cucumber", quantity: "1/2" },
+    { name: "Vinaigrette", quantity: "1/4 cup" }
+  ];
+  if (sideName.includes("Roasted Sweet Potatoes")) return [
+    { name: "Sweet potatoes", quantity: "2 large cubed" },
+    { name: "Olive oil", quantity: "2 tbsp" },
+    { name: "Maple syrup", quantity: "1 tbsp" },
+    { name: "Cinnamon", quantity: "1/2 tsp" }
+  ];
+  if (sideName.includes("Cilantro Lime Rice")) return [
+    { name: "White rice", quantity: "1 cup" },
+    { name: "Lime juice", quantity: "2 tbsp" },
+    { name: "Cilantro", quantity: "1/4 cup chopped" }
+  ];
+  if (sideName.includes("Baguette")) return [
+    { name: "Baguette", quantity: "1 loaf" },
+    { name: "Butter", quantity: "2 tbsp" }
+  ];
+  return [{ name: "Side ingredient", quantity: "1 serving" }];
+}
+
+function vegIngredients(vegName) {
+  if (vegName.includes("Bell Peppers")) return [
+    { name: "Bell peppers", quantity: "2" },
+    { name: "Onion", quantity: "1" },
+    { name: "Olive oil", quantity: "1 tbsp" }
+  ];
+  if (vegName.includes("Broccoli")) return [
+    { name: "Broccoli florets", quantity: "1 head" },
+    { name: "Garlic", quantity: "2 cloves" },
+    { name: "Olive oil", quantity: "1 tbsp" },
+    { name: "Salt", quantity: "1/2 tsp" }
+  ];
+  if (vegName.includes("Carrots")) return [
+    { name: "Carrots", quantity: "1 lb" },
+    { name: "Honey", quantity: "2 tbsp" },
+    { name: "Butter", quantity: "1 tbsp" }
+  ];
+  if (vegName.includes("String Beans")) return [
+    { name: "String beans", quantity: "1 lb" },
+    { name: "Lemon zest", quantity: "1 tsp" },
+    { name: "Almonds", quantity: "1/4 cup sliced" }
+  ];
+  if (vegName.includes("Cheesy Broccoli")) return [
+    { name: "Broccoli", quantity: "1 head" },
+    { name: "Cheddar cheese", quantity: "1 cup shredded" },
+    { name: "Cream of mushroom soup", quantity: "1 can" }
+  ];
+  if (vegName.includes("Stuffed Bell Peppers")) return [
+    { name: "Bell peppers", quantity: "4" },
+    { name: "Ground beef", quantity: "1 lb" },
+    { name: "Rice", quantity: "1 cup cooked" },
+    { name: "Tomato sauce", quantity: "1 cup" }
+  ];
+  if (vegName.includes("Parsnips")) return [
+    { name: "Carrots", quantity: "0.5 lb" },
+    { name: "Parsnips", quantity: "0.5 lb" },
+    { name: "Olive oil", quantity: "1 tbsp" }
+  ];
+  if (vegName.includes("Szechuan String Beans")) return [
+    { name: "String beans", quantity: "1 lb" },
+    { name: "Soy sauce", quantity: "2 tbsp" },
+    { name: "Chili paste", quantity: "1 tsp" },
+    { name: "Garlic", quantity: "2 cloves" }
+  ];
+  if (vegName.includes("Cauliflower")) return [
+    { name: "Broccoli", quantity: "1/2 head" },
+    { name: "Cauliflower", quantity: "1/2 head" },
+    { name: "Olive oil", quantity: "1 tbsp" }
+  ];
+  if (vegName.includes("Ginger Sesame Carrots")) return [
+    { name: "Carrots", quantity: "1 lb" },
+    { name: "Sesame oil", quantity: "1 tsp" },
+    { name: "Ginger", quantity: "1 tsp grated" }
+  ];
+  if (vegName.includes("Fajita Peppers")) return [
+    { name: "Bell peppers", quantity: "2" },
+    { name: "Onion", quantity: "1" },
+    { name: "Fajita seasoning", quantity: "1 tsp" }
+  ];
+  if (vegName.includes("Almondine")) return [
+    { name: "String beans", quantity: "1 lb" },
+    { name: "Almonds", quantity: "1/4 cup" },
+    { name: "Butter", quantity: "1 tbsp" }
+  ];
+  if (vegName.includes("Air Fryer Broccoli")) return [
+    { name: "Broccoli", quantity: "1 head" },
+    { name: "Olive oil spray", quantity: "as needed" },
+    { name: "Parmesan", quantity: "2 tbsp" }
+  ];
+  if (vegName.includes("Maple Dill Carrots")) return [
+    { name: "Carrots", quantity: "1 lb" },
+    { name: "Maple syrup", quantity: "2 tbsp" },
+    { name: "Fresh dill", quantity: "1 tbsp chopped" }
+  ];
+  return [{ name: "Vegetable", quantity: "1 bunch" }];
+}
+
+// Populate RECIPES
+addRecipes(MAIN_DISHES, 'Main Dish', mainIngredients);
+addRecipes(SIDES, 'Side', sideIngredients);
+addRecipes(VEGETABLES, 'Vegetable', vegIngredients);
+
+// Instructions are simple for demo
+Object.keys(RECIPES).forEach(name => {
+  if (!RECIPES[name].instructions) {
+    RECIPES[name].instructions = `1. Prepare ingredients.\n2. Cook ${name}.\n3. Serve.`;
+  }
+});
+
+function getRecipeText(dishName) {
+  const recipe = RECIPES[dishName];
+  if (!recipe) return `Recipe for "${dishName}" is not yet available.`;
+  
+  let text = `📋 **${dishName}** (${recipe.category})\n\n`;
+  text += `**Ingredients:**\n`;
+  recipe.ingredients.forEach(ing => {
+    text += `- ${ing.quantity} ${ing.name}\n`;
+  });
+  text += `\n**Instructions:**\n${recipe.instructions}`;
+  return text;
+}
+
+// --------------------------------------------------------------
+// GROCERY LIST CATEGORIZATION & QUANTITY PARSING
+// --------------------------------------------------------------
+
+const CATEGORY_KEYWORDS = {
+  'Meat & Seafood': ['chicken', 'beef', 'pork', 'salmon', 'shrimp', 'cod', 'sausage', 'tenderloin', 'steak', 'ground', 'thighs', 'breast', 'pepperoni', 'dumpling', 'andouille'],
+  'Produce': ['onion', 'garlic', 'lemon', 'herbs', 'rosemary', 'thyme', 'bell pepper', 'carrot', 'broccoli', 'cauliflower', 'string bean', 'parsnip', 'ginger', 'cilantro', 'lime', 'corn', 'mixed greens', 'tomato', 'cucumber', 'dill', 'potato', 'sweet potato'],
+  'Dairy & Eggs': ['butter', 'milk', 'cheese', 'mozzarella', 'parmesan', 'cheddar', 'cream', 'egg'],
+  'Pantry': ['oil', 'olive oil', 'sauce', 'worcestershire', 'bbq sauce', 'soy sauce', 'vinegar', 'salt', 'pepper', 'sugar', 'brown sugar', 'flour', 'rice', 'noodle', 'pasta', 'bread', 'baguette', 'roll', 'pizza dough', 'seasoning', 'paprika', 'cumin', 'chili', 'spice', 'maple syrup', 'honey', 'vinaigrette', 'canned', 'soup', 'dumpling wrapper']
+};
+
+function getCategory(ingredientName) {
+  const lowerName = ingredientName.toLowerCase();
+  for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (keywords.some(kw => lowerName.includes(kw))) {
+      return category;
+    }
+  }
+  return 'Other';
+}
+
+// Parse quantity string like "1.5 lbs" into { value: 1.5, unit: "lbs" }
+function parseQuantity(qtyStr) {
+  const match = qtyStr.match(/^([\d./]+)\s*([a-zA-Z]*)$/);
+  if (!match) return null;
+  let value = match[1];
+  const unit = match[2] || '';
+  // Handle fractions like "1/2"
+  if (value.includes('/')) {
+    const parts = value.split('/');
+    if (parts.length === 2) {
+      value = parseFloat(parts[0]) / parseFloat(parts[1]);
+    } else {
+      value = parseFloat(value);
+    }
+  } else {
+    value = parseFloat(value);
+  }
+  return isNaN(value) ? null : { value, unit: unit.trim() };
+}
+
+// Format combined quantity
+function formatQuantity(value, unit) {
+  // Round to 2 decimals if needed
+  const rounded = Math.round(value * 100) / 100;
+  return `${rounded} ${unit}`.trim();
+}
+
+// Combine quantities for same unit
+function combineQuantities(existing, newQty) {
+  const parsedExisting = parseQuantity(existing);
+  const parsedNew = parseQuantity(newQty);
+  if (!parsedExisting || !parsedNew) return existing; // fallback to string concat? we'll just return existing and add note
+  
+  if (parsedExisting.unit === parsedNew.unit) {
+    const total = parsedExisting.value + parsedNew.value;
+    return formatQuantity(total, parsedExisting.unit);
+  }
+  // Different units - keep separate by returning a combined string? Actually we'll just keep as separate entries.
+  // But here we return existing (won't combine)
+  return existing;
+}
+
+// --------------------------------------------------------------
+// WEEKLY PLAN & STATE
+// --------------------------------------------------------------
+
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TOTAL_DAYS = 7;
 
-// Core state
 let weeklyPlan = new Array(TOTAL_DAYS).fill(null);
 let nextFillIndex = 0;
 let dayCells = { main: [], side: [], veg: [] };
 let blockerCheckboxes = [];
+
+// Grocery state
+let currentGroceryItems = []; // array of { id, name, quantity, category }
 
 // DOM elements
 const generateBtn = document.getElementById("generateBtn");
 const resetBtn = document.getElementById("resetBtn");
 const feedbackDiv = document.getElementById("feedbackMsg");
 
-// Meat filters
 const filterChicken = document.getElementById("filterChicken");
 const filterBeef = document.getElementById("filterBeef");
 const filterPork = document.getElementById("filterPork");
 const filterFish = document.getElementById("filterFish");
 
-// Veggie filters
 const filterPeppers = document.getElementById("filterPeppers");
 const filterBroccoli = document.getElementById("filterBroccoli");
 const filterCarrots = document.getElementById("filterCarrots");
 const filterStringBeans = document.getElementById("filterStringBeans");
 
-// Collapsible filters
 const filterToggleBtn = document.getElementById("filterToggleBtn");
 const filtersCard = document.getElementById("filtersCard");
 
@@ -90,7 +403,197 @@ filterToggleBtn.addEventListener("click", () => {
   icon.textContent = filtersCard.classList.contains("show") ? "▲" : "▼";
 });
 
-// Helper functions
+// Recipe panel
+const recipePanel = document.getElementById('recipePanel');
+const recipeTitle = document.getElementById('recipeTitle');
+const recipeContent = document.getElementById('recipeContent');
+const closeRecipeBtn = document.getElementById('closeRecipeBtn');
+
+function showRecipe(dishName, category) {
+  recipeTitle.textContent = `${dishName} (${category})`;
+  recipeContent.textContent = getRecipeText(dishName);
+  recipePanel.classList.add('show');
+  recipePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function hideRecipe() { recipePanel.classList.remove('show'); }
+closeRecipeBtn.addEventListener('click', hideRecipe);
+
+// Grocery elements
+const groceryToggleBtn = document.getElementById('groceryToggleBtn');
+const groceryPanel = document.getElementById('groceryPanel');
+const groceryItemCount = document.getElementById('groceryItemCount');
+const generateGroceryBtn = document.getElementById('generateGroceryBtn');
+const clearGroceryBtn = document.getElementById('clearGroceryBtn');
+const groceryCategoriesContainer = document.getElementById('groceryCategoriesContainer');
+
+groceryToggleBtn.addEventListener('click', () => {
+  groceryPanel.classList.toggle('show');
+});
+
+function generateGroceryList() {
+  const ingredientMap = new Map(); // key: name_lower|unit -> { name, quantity, unit, category }
+  
+  weeklyPlan.forEach((meal) => {
+    if (!meal) return;
+    const dishes = [
+      { name: meal.main, blocked: meal.main === "[Blocked]" },
+      { name: meal.side, blocked: meal.side === "[Blocked]" },
+      { name: meal.veg, blocked: meal.veg === "[Blocked]" }
+    ];
+    dishes.forEach(dish => {
+      if (dish.blocked) return;
+      const recipe = RECIPES[dish.name];
+      if (!recipe) return;
+      recipe.ingredients.forEach(ing => {
+        const parsed = parseQuantity(ing.quantity);
+        if (!parsed) return; // skip unparseable for now
+        
+        const unit = parsed.unit;
+        const key = `${ing.name.toLowerCase()}|${unit}`;
+        
+        if (ingredientMap.has(key)) {
+          const existing = ingredientMap.get(key);
+          existing.quantityValue += parsed.value;
+        } else {
+          ingredientMap.set(key, {
+            name: ing.name,
+            quantityValue: parsed.value,
+            unit: unit,
+            category: getCategory(ing.name)
+          });
+        }
+      });
+    });
+  });
+  
+  const items = Array.from(ingredientMap.values()).map((item, index) => ({
+    id: `groc-${Date.now()}-${index}`,
+    name: item.name,
+    quantity: formatQuantity(item.quantityValue, item.unit),
+    category: item.category
+  }));
+  
+  currentGroceryItems = items;
+  renderGroceryList();
+}
+
+function renderGroceryList() {
+  if (currentGroceryItems.length === 0) {
+    groceryCategoriesContainer.innerHTML = '<div class="empty-grocery-message">No ingredients yet. Click "Generate List from Plan" after filling your week.</div>';
+    groceryItemCount.textContent = '0';
+    return;
+  }
+  
+  // Group by category
+  const categories = {};
+  currentGroceryItems.forEach(item => {
+    if (!categories[item.category]) categories[item.category] = [];
+    categories[item.category].push(item);
+  });
+  
+  const categoryOrder = ['Meat & Seafood', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
+  
+  let html = '';
+  for (const cat of categoryOrder) {
+    if (categories[cat] && categories[cat].length > 0) {
+      html += `<div class="grocery-category">`;
+      html += `<div class="grocery-category-title">${cat}</div>`;
+      html += `<ul class="grocery-list">`;
+      categories[cat].forEach(item => {
+        html += `
+          <li class="grocery-item" data-id="${item.id}">
+            <div class="grocery-item-info">
+              <span class="grocery-item-name">${item.name}</span>
+              <span class="grocery-item-quantity" data-id="${item.id}">${item.quantity}</span>
+            </div>
+            <div class="grocery-item-actions">
+              <button class="grocery-remove-btn" data-id="${item.id}" title="Remove item">✕</button>
+            </div>
+          </li>
+        `;
+      });
+      html += `</ul></div>`;
+    }
+  }
+  // Handle any remaining categories not in order
+  Object.keys(categories).forEach(cat => {
+    if (!categoryOrder.includes(cat) && categories[cat].length > 0) {
+      html += `<div class="grocery-category">`;
+      html += `<div class="grocery-category-title">${cat}</div>`;
+      html += `<ul class="grocery-list">`;
+      categories[cat].forEach(item => {
+        html += `
+          <li class="grocery-item" data-id="${item.id}">
+            <div class="grocery-item-info">
+              <span class="grocery-item-name">${item.name}</span>
+              <span class="grocery-item-quantity" data-id="${item.id}">${item.quantity}</span>
+            </div>
+            <div class="grocery-item-actions">
+              <button class="grocery-remove-btn" data-id="${item.id}" title="Remove item">✕</button>
+            </div>
+          </li>
+        `;
+      });
+      html += `</ul></div>`;
+    }
+  });
+  
+  groceryCategoriesContainer.innerHTML = html;
+  groceryItemCount.textContent = currentGroceryItems.length;
+  
+  // Attach event listeners
+  document.querySelectorAll('.grocery-remove-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = btn.dataset.id;
+      removeGroceryItem(id);
+    });
+  });
+  
+  document.querySelectorAll('.grocery-item-quantity').forEach(span => {
+    span.addEventListener('click', (e) => {
+      const id = span.dataset.id;
+      makeQuantityEditable(span, id);
+    });
+  });
+}
+
+function removeGroceryItem(id) {
+  currentGroceryItems = currentGroceryItems.filter(item => item.id !== id);
+  renderGroceryList();
+}
+
+function makeQuantityEditable(span, id) {
+  const currentQuantity = span.textContent;
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.value = currentQuantity;
+  input.addEventListener('blur', () => updateQuantity(id, input.value));
+  input.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') updateQuantity(id, input.value);
+  });
+  span.innerHTML = '';
+  span.appendChild(input);
+  input.focus();
+}
+
+function updateQuantity(id, newQuantity) {
+  const item = currentGroceryItems.find(i => i.id === id);
+  if (item) item.quantity = newQuantity;
+  renderGroceryList();
+}
+
+function clearGroceryList() {
+  currentGroceryItems = [];
+  renderGroceryList();
+}
+
+generateGroceryBtn.addEventListener('click', generateGroceryList);
+clearGroceryBtn.addEventListener('click', clearGroceryList);
+
+// --------------------------------------------------------------
+// FILTER & RANDOMIZATION FUNCTIONS
+// --------------------------------------------------------------
+
 function getSelectedMeats() {
   const selected = [];
   if (filterChicken.checked) selected.push("chicken");
@@ -101,9 +604,7 @@ function getSelectedMeats() {
 }
 
 function getFilteredMains(selectedMeats) {
-  if (selectedMeats.length === 0) {
-    return MAIN_DISHES.filter(dish => dish.meats.length > 0);
-  }
+  if (selectedMeats.length === 0) return MAIN_DISHES.filter(dish => dish.meats.length > 0);
   return MAIN_DISHES.filter(dish => dish.meats.some(meat => selectedMeats.includes(meat)));
 }
 
@@ -123,18 +624,14 @@ function getFilteredVeggies(selectedVeggies) {
 
 function getRandomMain() {
   const eligible = getFilteredMains(getSelectedMeats());
-  if (eligible.length === 0) return null;
-  return eligible[Math.floor(Math.random() * eligible.length)].name;
+  return eligible.length ? eligible[Math.floor(Math.random() * eligible.length)].name : null;
 }
-
 function getRandomSide() {
   return SIDES[Math.floor(Math.random() * SIDES.length)];
 }
-
 function getRandomVeg() {
   const eligible = getFilteredVeggies(getSelectedVeggies());
-  if (eligible.length === 0) return null;
-  return eligible[Math.floor(Math.random() * eligible.length)].name;
+  return eligible.length ? eligible[Math.floor(Math.random() * eligible.length)].name : null;
 }
 
 function checkEligibility() {
@@ -144,7 +641,10 @@ function checkEligibility() {
   };
 }
 
-// Table building with blockers
+// --------------------------------------------------------------
+// TABLE BUILDING & SYNC
+// --------------------------------------------------------------
+
 function buildTable() {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
@@ -153,7 +653,6 @@ function buildTable() {
 
   for (let i = 0; i < WEEKDAYS.length; i++) {
     const row = document.createElement("tr");
-
     const dayCell = document.createElement("td");
     dayCell.className = "day-name";
     dayCell.textContent = WEEKDAYS[i];
@@ -171,31 +670,27 @@ function buildTable() {
     const blockerDiv = document.createElement("div");
     blockerDiv.className = "blocker-checkbox-group";
 
-    const mainBlockId = `blockMain_${i}`;
-    const sideBlockId = `blockSide_${i}`;
-    const vegBlockId = `blockVeg_${i}`;
-
     const mainCheck = document.createElement("input");
     mainCheck.type = "checkbox";
-    mainCheck.id = mainBlockId;
+    mainCheck.id = `blockMain_${i}`;
     const mainLabel = document.createElement("label");
-    mainLabel.htmlFor = mainBlockId;
+    mainLabel.htmlFor = mainCheck.id;
     mainLabel.innerHTML = "Block Main Dish";
     mainLabel.prepend(mainCheck);
 
     const sideCheck = document.createElement("input");
     sideCheck.type = "checkbox";
-    sideCheck.id = sideBlockId;
+    sideCheck.id = `blockSide_${i}`;
     const sideLabel = document.createElement("label");
-    sideLabel.htmlFor = sideBlockId;
+    sideLabel.htmlFor = sideCheck.id;
     sideLabel.innerHTML = "Block Side";
     sideLabel.prepend(sideCheck);
 
     const vegCheck = document.createElement("input");
     vegCheck.type = "checkbox";
-    vegCheck.id = vegBlockId;
+    vegCheck.id = `blockVeg_${i}`;
     const vegLabel = document.createElement("label");
-    vegLabel.htmlFor = vegBlockId;
+    vegLabel.htmlFor = vegCheck.id;
     vegLabel.innerHTML = "Block Vegetable";
     vegLabel.prepend(vegCheck);
 
@@ -213,11 +708,7 @@ function buildTable() {
     dayCells.main.push(mainTd);
     dayCells.side.push(sideTd);
     dayCells.veg.push(vegTd);
-    blockerCheckboxes.push({
-      main: mainCheck,
-      side: sideCheck,
-      veg: vegCheck
-    });
+    blockerCheckboxes.push({ main: mainCheck, side: sideCheck, veg: vegCheck });
   }
   syncTableFromPlan();
 }
@@ -226,30 +717,70 @@ function syncTableFromPlan() {
   if (dayCells.main.length === 0) buildTable();
   for (let i = 0; i < TOTAL_DAYS; i++) {
     const meal = weeklyPlan[i];
+    const mainCell = dayCells.main[i];
+    const sideCell = dayCells.side[i];
+    const vegCell = dayCells.veg[i];
+    
     if (meal) {
-      dayCells.main[i].textContent = meal.main;
-      dayCells.main[i].classList.remove("empty-meal");
-      dayCells.side[i].textContent = meal.side;
-      dayCells.side[i].classList.remove("empty-meal");
-      dayCells.veg[i].textContent = meal.veg;
-      dayCells.veg[i].classList.remove("empty-meal");
+      if (meal.main !== "[Blocked]") {
+        mainCell.textContent = meal.main;
+        mainCell.classList.add('clickable');
+        mainCell.onclick = () => showRecipe(meal.main, 'Main Dish');
+      } else {
+        mainCell.textContent = meal.main;
+        mainCell.classList.remove('clickable');
+        mainCell.onclick = null;
+      }
+      mainCell.classList.remove("empty-meal");
+      
+      if (meal.side !== "[Blocked]") {
+        sideCell.textContent = meal.side;
+        sideCell.classList.add('clickable');
+        sideCell.onclick = () => showRecipe(meal.side, 'Side');
+      } else {
+        sideCell.textContent = meal.side;
+        sideCell.classList.remove('clickable');
+        sideCell.onclick = null;
+      }
+      sideCell.classList.remove("empty-meal");
+      
+      if (meal.veg !== "[Blocked]") {
+        vegCell.textContent = meal.veg;
+        vegCell.classList.add('clickable');
+        vegCell.onclick = () => showRecipe(meal.veg, 'Vegetable');
+      } else {
+        vegCell.textContent = meal.veg;
+        vegCell.classList.remove('clickable');
+        vegCell.onclick = null;
+      }
+      vegCell.classList.remove("empty-meal");
+      
     } else {
-      dayCells.main[i].textContent = "— not assigned —";
-      dayCells.main[i].classList.add("empty-meal");
-      dayCells.side[i].textContent = "— not assigned —";
-      dayCells.side[i].classList.add("empty-meal");
-      dayCells.veg[i].textContent = "— not assigned —";
-      dayCells.veg[i].classList.add("empty-meal");
+      mainCell.textContent = "— not assigned —";
+      mainCell.classList.add("empty-meal");
+      mainCell.classList.remove('clickable');
+      mainCell.onclick = null;
+      
+      sideCell.textContent = "— not assigned —";
+      sideCell.classList.add("empty-meal");
+      sideCell.classList.remove('clickable');
+      sideCell.onclick = null;
+      
+      vegCell.textContent = "— not assigned —";
+      vegCell.classList.add("empty-meal");
+      vegCell.classList.remove('clickable');
+      vegCell.onclick = null;
     }
   }
 }
 
-// Core actions
 function resetWeeklyPlan() {
   weeklyPlan = new Array(TOTAL_DAYS).fill(null);
   nextFillIndex = 0;
   syncTableFromPlan();
   feedbackDiv.innerHTML = "Weekly plan cleared. Use 'Generate' to start filling from Monday.";
+  feedbackDiv.style.background = "#eef4eb";
+  feedbackDiv.style.color = "#2b6e3c";
 }
 
 function generateAndFillNextDay() {
@@ -308,13 +839,8 @@ function generateAndFillNextDay() {
   weeklyPlan[idx] = newMeal;
   const currentDay = WEEKDAYS[idx];
   nextFillIndex++;
-
-  dayCells.main[idx].textContent = mainChoice;
-  dayCells.main[idx].classList.remove("empty-meal");
-  dayCells.side[idx].textContent = sideChoice;
-  dayCells.side[idx].classList.remove("empty-meal");
-  dayCells.veg[idx].textContent = vegChoice;
-  dayCells.veg[idx].classList.remove("empty-meal");
+  
+  syncTableFromPlan();
 
   const remaining = TOTAL_DAYS - nextFillIndex;
   if (remaining === 0) {
@@ -329,7 +855,10 @@ function generateAndFillNextDay() {
   return true;
 }
 
-// Event binding
+// --------------------------------------------------------------
+// EVENT BINDING & INIT
+// --------------------------------------------------------------
+
 function bindEvents() {
   generateBtn.addEventListener("click", () => generateAndFillNextDay());
   resetBtn.addEventListener("click", () => {
@@ -361,15 +890,6 @@ function bindEvents() {
   });
 }
 
-// Logo fallback
-const logoImg = document.getElementById("logoImage");
-if (logoImg) {
-  logoImg.onerror = function() {
-    this.style.display = "none";
-  };
-}
-
-// Initialization
 function init() {
   buildTable();
   resetWeeklyPlan();

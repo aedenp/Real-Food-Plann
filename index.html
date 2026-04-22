@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Real Meal Plan | Weekly Dinner Randomizer</title>
+  <title>Real Meal Plan | Calendar Planner</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
@@ -11,80 +11,87 @@
 </head>
 <body>
 <div class="container">
-  <!-- Title Card with Logo Support -->
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <a href="index.html" class="nav-link">Weekly Randomizer</a>
+    <a href="calendar.html" class="nav-link active">Calendar Planner</a>
+  </nav>
+
   <div class="title-card">
     <div class="logo-area">
       <img src="your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
-      <h1>Real Meal Plan</h1>
+      <h1>Meal Calendar</h1>
     </div>
-    <p class="tagline">Build your weekly dinner menu — one complete meal at a time</p>
+    <p class="tagline">Plan your dinners for any date — past, present, or future</p>
   </div>
 
-  <!-- Collapsible Filters Section -->
-  <div class="filters-collapsible">
-    <button class="filter-toggle-btn" id="filterToggleBtn">
-      <span class="toggle-icon">▼</span> Select your filters
-    </button>
-    <div class="filters-card" id="filtersCard">
-      <div class="filter-group">
-        <div class="filter-subheading">
-          <span class="icon">🍖</span> Main dish protein preferences
+  <!-- Calendar Controls -->
+  <div class="calendar-controls">
+    <div class="month-nav">
+      <button class="btn btn-secondary btn-small" id="prevMonthBtn">← Prev</button>
+      <h2 id="currentMonthDisplay">April 2026</h2>
+      <button class="btn btn-secondary btn-small" id="nextMonthBtn">Next →</button>
+    </div>
+    <button class="btn btn-primary btn-small" id="todayBtn">Today</button>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="calendar-wrapper">
+    <div class="calendar-header">
+      <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+    </div>
+    <div class="calendar-grid" id="calendarGrid">
+      <!-- Days injected via JS -->
+    </div>
+  </div>
+
+  <!-- Day Detail Panel (shown when a day is clicked) -->
+  <div class="day-detail-panel" id="dayDetailPanel">
+    <div class="day-detail-header">
+      <h3 id="selectedDateDisplay">Select a date</h3>
+      <button class="recipe-close-btn" id="closeDayDetailBtn">&times;</button>
+    </div>
+    <div class="day-detail-content" id="dayDetailContent">
+      <div class="meal-form">
+        <label>Main Dish:</label>
+        <select id="mainSelect" class="meal-select">
+          <option value="">— Select Main —</option>
+        </select>
+        <label>Side:</label>
+        <select id="sideSelect" class="meal-select">
+          <option value="">— Select Side —</option>
+        </select>
+        <label>Vegetable:</label>
+        <select id="vegSelect" class="meal-select">
+          <option value="">— Select Vegetable —</option>
+        </select>
+        <div class="form-actions">
+          <button class="btn btn-primary btn-small" id="saveMealBtn">Save Meal</button>
+          <button class="btn btn-secondary btn-small" id="clearMealBtn">Clear</button>
         </div>
-        <div class="checkbox-group" id="meatFilters">
-          <label><input type="checkbox" value="chicken" id="filterChicken"> Chicken</label>
-          <label><input type="checkbox" value="beef" id="filterBeef"> Beef</label>
-          <label><input type="checkbox" value="pork" id="filterPork"> Pork</label>
-          <label><input type="checkbox" value="fish" id="filterFish"> Fish / Seafood</label>
-        </div>
-        <div class="filter-note">If no protein selected → only meat-based mains (no vegetarian). Select one or more to require those proteins.</div>
       </div>
-
-      <div class="filter-divider"></div>
-
-      <div class="filter-group">
-        <div class="filter-subheading">
-          <span class="icon">🥬</span> Vegetable preferences
-        </div>
-        <div class="checkbox-group" id="veggieFilters">
-          <label><input type="checkbox" value="peppers" id="filterPeppers"> Bell peppers</label>
-          <label><input type="checkbox" value="broccoli" id="filterBroccoli"> Broccoli</label>
-          <label><input type="checkbox" value="carrots" id="filterCarrots"> Carrots</label>
-          <label><input type="checkbox" value="stringbeans" id="filterStringBeans"> String beans</label>
-        </div>
-        <div class="filter-note">If no vegetable selected → any vegetable allowed. Select one or more to require those veggies.</div>
+      <!-- Random fill for week starting from selected date -->
+      <div class="random-week-section">
+        <p>Or quickly fill a week starting from this date:</p>
+        <button class="btn btn-secondary" id="fillWeekBtn">🎲 Random Fill Week</button>
       </div>
     </div>
   </div>
 
-  <!-- Control bar -->
-  <div class="action-bar">
-    <div class="btn-group">
-      <button class="btn btn-primary" id="generateBtn">Generate & fill next day</button>
-      <button class="btn btn-secondary" id="resetBtn">Reset weekly plan</button>
+  <!-- Recipe Panel (same as main page) -->
+  <div class="recipe-panel" id="recipePanel">
+    <div class="recipe-header">
+      <h3 id="recipeTitle">Recipe</h3>
+      <button class="recipe-close-btn" id="closeRecipeBtn">&times;</button>
     </div>
-    <div class="feedback" id="feedbackMsg">Click generate — fills Monday → Sunday</div>
+    <div class="recipe-content" id="recipeContent">
+      Select a dish above to view its recipe.
+    </div>
   </div>
 
-  <!-- Weekly table with blocker columns -->
-  <div class="table-wrapper">
-    <table class="week-table" id="weeklyTable">
-      <thead>
-        <tr>
-          <th>Day</th>
-          <th>Main Dish</th>
-          <th>Side</th>
-          <th>Vegetable</th>
-          <th>Blockers</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody">
-        <!-- rows injected via JS -->
-      </tbody>
-    </table>
-  </div>
-  <footer>Each click picks a random meal (respecting filters) and fills the next empty day. Use blockers to skip main dish, side, or vegetable for any day.</footer>
+  <footer>Click any date to view or edit dinner plans. Changes are saved automatically in your browser.</footer>
 </div>
 
-<script src="script.js"></script>
+<script src="calendar.js"></script>
 </body>
 </html>
