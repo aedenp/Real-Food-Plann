@@ -16,9 +16,8 @@ body {
   margin: 0 auto;
   background: rgba(255, 255, 245, 0.95);
   border-radius: 2rem;
-  box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 20px 35px -12px rgba(0,0,0,0.15), 0 1px 3px rgba(0,0,0,0.05);
   padding: 1.8rem 2rem 2.5rem;
-  transition: all 0.2s ease;
   border: 1px solid #b3d9a8;
 }
 
@@ -78,7 +77,6 @@ h1 {
   font-weight: 700;
   color: #2b6e3c;
   letter-spacing: -0.5px;
-  margin: 0;
 }
 
 .tagline {
@@ -130,7 +128,7 @@ h1 {
   border-radius: 1.5rem;
   padding: 1.4rem 1.8rem;
   margin-top: 0.8rem;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
   border: 1px solid #c8e0bf;
   display: none;
 }
@@ -162,7 +160,6 @@ h1 {
   display: flex;
   flex-wrap: wrap;
   gap: 1rem;
-  row-gap: 0.6rem;
   align-items: center;
   margin-bottom: 0.5rem;
 }
@@ -192,7 +189,6 @@ h1 {
   width: 1rem;
   height: 1rem;
   accent-color: #6fbf4c;
-  cursor: pointer;
   margin: 0;
 }
 
@@ -238,7 +234,7 @@ h1 {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
 .btn-small {
@@ -249,13 +245,12 @@ h1 {
 .btn-primary {
   background: #4c8c4a;
   color: white;
-  border: none;
 }
 
 .btn-primary:hover {
   background: #3c723a;
   transform: translateY(-2px);
-  box-shadow: 0 10px 18px -8px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 10px 18px -8px rgba(0,0,0,0.15);
 }
 
 .btn-secondary {
@@ -284,12 +279,12 @@ h1 {
   border-left: 3px solid #8fcb7a;
 }
 
-/* Table Styles */
+/* Table */
 .table-wrapper {
   overflow-x: auto;
   border-radius: 1.5rem;
   background: white;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.03);
   border: 1px solid #d8e8d2;
 }
 
@@ -297,7 +292,7 @@ h1 {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.85rem;
-  min-width: 800px;
+  min-width: 900px;
 }
 
 .week-table th {
@@ -313,8 +308,6 @@ h1 {
 .week-table td {
   padding: 0.7rem 0.8rem;
   border-bottom: 1px solid #e2eedd;
-  color: #1e3a2f;
-  font-weight: 500;
   vertical-align: middle;
 }
 
@@ -339,7 +332,6 @@ h1 {
   font-weight: 400;
 }
 
-/* Clickable dish cells */
 .meal-cell.clickable,
 .side-cell.clickable,
 .veg-cell.clickable {
@@ -356,7 +348,6 @@ h1 {
   text-underline-offset: 3px;
 }
 
-/* Blocker column styling */
 .blocker-cell {
   background-color: #fcfef9;
   text-align: center;
@@ -383,8 +374,28 @@ h1 {
   width: 0.9rem;
   height: 0.9rem;
   accent-color: #6fbf4c;
+}
+
+.action-cell {
+  text-align: center;
+  white-space: nowrap;
+}
+
+.clear-day-btn {
+  background: none;
+  border: 1px solid #e2b6b6;
+  color: #b91c1c;
+  font-size: 0.7rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 30px;
   cursor: pointer;
-  margin: 0;
+  transition: all 0.15s;
+  font-weight: 500;
+}
+
+.clear-day-btn:hover {
+  background: #fee2e2;
+  border-color: #b91c1c;
 }
 
 /* Save to Calendar Section */
@@ -408,7 +419,7 @@ h1 {
   background: #f8fcf6;
   border-radius: 1.5rem;
   border: 1px solid #c8e0bf;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
   overflow: hidden;
   display: none;
 }
@@ -430,7 +441,6 @@ h1 {
   color: #2b6e3c;
   font-weight: 600;
   font-size: 1.2rem;
-  margin: 0;
 }
 
 .recipe-close-btn {
@@ -440,8 +450,6 @@ h1 {
   line-height: 1;
   cursor: pointer;
   color: #4a7c5c;
-  padding: 0 0.5rem;
-  transition: color 0.2s;
 }
 
 .recipe-close-btn:hover {
@@ -450,13 +458,12 @@ h1 {
 
 .recipe-content {
   padding: 1.5rem 1.8rem;
-  color: #1e3a2f;
   font-size: 0.9rem;
   line-height: 1.6;
   white-space: pre-wrap;
 }
 
-/* Grocery List Section */
+/* Grocery List */
 .grocery-section {
   margin-top: 2rem;
 }
@@ -498,7 +505,7 @@ h1 {
   border-radius: 1.5rem;
   padding: 1.5rem;
   margin-top: 0.8rem;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
   border: 1px solid #c8e0bf;
   display: none;
 }
@@ -520,7 +527,6 @@ h1 {
   color: #2b6e3c;
   font-weight: 600;
   font-size: 1.2rem;
-  margin: 0;
 }
 
 .grocery-list-container {
@@ -580,7 +586,6 @@ h1 {
 
 .grocery-item-name {
   font-weight: 600;
-  color: #1e3a2f;
   min-width: 120px;
 }
 
@@ -619,7 +624,6 @@ h1 {
   font-size: 1.2rem;
   padding: 0.2rem 0.5rem;
   border-radius: 20px;
-  transition: all 0.2s;
 }
 
 .grocery-remove-btn:hover {
@@ -658,7 +662,6 @@ h1 {
 .month-nav h2 {
   color: #2b6e3c;
   font-size: 1.5rem;
-  margin: 0;
   min-width: 200px;
   text-align: center;
 }
@@ -754,7 +757,7 @@ h1 {
 
 .calendar-day.selected {
   border: 3px solid #4c8c4a;
-  box-shadow: 0 0 0 2px rgba(76, 140, 74, 0.2);
+  box-shadow: 0 0 0 2px rgba(76,140,74,0.2);
 }
 
 .day-number {
@@ -770,7 +773,6 @@ h1 {
   color: #3c723a;
   margin-top: 0.1rem;
   overflow: hidden;
-  text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -789,7 +791,7 @@ h1 {
   background: #f8fcf6;
   border-radius: 1.5rem;
   border: 1px solid #c8e0bf;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
   overflow: hidden;
   display: none;
 }
@@ -811,7 +813,6 @@ h1 {
   color: #2b6e3c;
   font-weight: 600;
   font-size: 1.2rem;
-  margin: 0;
 }
 
 .day-detail-content {
@@ -857,7 +858,7 @@ h1 {
   color: #4a7c5c;
 }
 
-/* Modal Styles */
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -900,11 +901,206 @@ h1 {
   justify-content: flex-end;
 }
 
-/* Select mode active indicator */
 #selectModeToggle.active {
   background: #4c8c4a;
   color: white;
   border-color: #3c723a;
+}
+
+/* Budget Tracker styles */
+.budget-section {
+  margin-top: 2rem;
+  background: #f8fcf6;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  border: 1px solid #c8e0bf;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+}
+
+.budget-section h2 {
+  color: #2b6e3c;
+  margin-bottom: 1rem;
+}
+
+.receipt-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.form-row label {
+  font-weight: 600;
+  min-width: 120px;
+  color: #2b6e3c;
+}
+
+.form-input, .form-select {
+  padding: 0.6rem 1rem;
+  border-radius: 40px;
+  border: 1px solid #bcd9b2;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: white;
+  color: #1e3a2f;
+}
+
+.form-input:disabled {
+  background: #f0f0f0;
+}
+
+.breakdown-toggle {
+  margin: 0.5rem 0;
+}
+
+.breakdown-inputs {
+  background: #f0f7ec;
+  padding: 1rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.category-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.category-row span {
+  font-weight: 500;
+  color: #2b6e3c;
+}
+
+.category-row input {
+  width: 120px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 20px;
+  border: 1px solid #bcd9b2;
+  font-family: inherit;
+}
+
+.summary-cards {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.summary-card {
+  background: white;
+  border-radius: 20px;
+  padding: 1rem 2rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.summary-label {
+  font-size: 0.8rem;
+  color: #4a7c5c;
+}
+
+.summary-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2b6e3c;
+}
+
+.charts-container {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.chart-wrapper {
+  flex: 1 1 300px;
+  min-width: 280px;
+  background: white;
+  padding: 1rem;
+  border-radius: 1rem;
+  border: 1px solid #e2eedd;
+  text-align: center;
+}
+
+.chart-wrapper h3 {
+  color: #2b6e3c;
+  margin-bottom: 0.8rem;
+}
+
+canvas {
+  max-width: 100%;
+  height: auto !important;
+}
+
+.filter-row {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.week-selector-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.day-strip {
+  display: flex;
+  gap: 0.4rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.day-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.5rem 0.8rem;
+  border-radius: 12px;
+  cursor: pointer;
+  background: #f4faf1;
+  border: 2px solid #e2eedd;
+  transition: all 0.15s;
+  min-width: 50px;
+}
+
+.day-chip:hover {
+  background: #e9f3e4;
+  border-color: #8fcb7a;
+}
+
+.day-chip.selected {
+  background: #4c8c4a;
+  color: white;
+  border-color: #3c723a;
+}
+
+.day-chip.today {
+  border-color: #f4a261;
+}
+
+.chip-day {
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.chip-date {
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 footer {
@@ -958,5 +1154,8 @@ footer {
   .month-nav {
     flex-wrap: wrap;
     justify-content: center;
+  }
+  .charts-container {
+    flex-direction: column;
   }
 }

@@ -11,13 +11,12 @@
 </head>
 <body>
 <div class="container">
-  <!-- Navigation -->
   <nav class="main-nav">
-    <a href="index.html" class="nav-link active">Weekly Randomizer</a>
-    <a href="calendar.html" class="nav-link">Calendar Planner</a>
-  </nav>
+  <a href="index.html" class="nav-link active">Weekly Randomizer</a>
+  <a href="calendar.html" class="nav-link">Calendar Planner</a>
+  <a href="budget.html" class="nav-link">Budget Tracker</a>
+</nav>
 
-  <!-- Title Card with Logo Support -->
   <div class="title-card">
     <div class="logo-area">
       <img src="your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
@@ -26,7 +25,6 @@
     <p class="tagline">Build your weekly dinner menu — one complete meal at a time</p>
   </div>
 
-  <!-- Collapsible Filters Section -->
   <div class="filters-collapsible">
     <button class="filter-toggle-btn" id="filterToggleBtn">
       <span class="toggle-icon">▼</span> Select your filters
@@ -42,7 +40,7 @@
           <label><input type="checkbox" value="pork" id="filterPork"> Pork</label>
           <label><input type="checkbox" value="fish" id="filterFish"> Fish / Seafood</label>
         </div>
-        <div class="filter-note">If no protein selected → only meat-based mains (no vegetarian). Select one or more to require those proteins.</div>
+        <div class="filter-note">If no protein selected → only meat‑based mains (no vegetarian). Select one or more to require those proteins.</div>
       </div>
 
       <div class="filter-divider"></div>
@@ -62,7 +60,6 @@
     </div>
   </div>
 
-  <!-- Control bar -->
   <div class="action-bar">
     <div class="btn-group">
       <button class="btn btn-primary" id="generateBtn">Generate & fill next day</button>
@@ -71,7 +68,6 @@
     <div class="feedback" id="feedbackMsg">Click generate — fills Monday → Sunday</div>
   </div>
 
-  <!-- Weekly table with blocker columns -->
   <div class="table-wrapper">
     <table class="week-table" id="weeklyTable">
       <thead>
@@ -81,34 +77,28 @@
           <th>Side</th>
           <th>Vegetable</th>
           <th>Blockers</th>
+          <th>Actions</th>
         </tr>
       </thead>
-      <tbody id="tableBody">
-        <!-- rows injected via JS -->
-      </tbody>
+      <tbody id="tableBody"></tbody>
     </table>
   </div>
-  
-  <!-- Save to Calendar Section -->
+
   <div class="save-calendar-section">
     <button class="btn btn-secondary" id="saveWeekToCalendarBtn">📅 Save This Week to Calendar</button>
     <div class="save-calendar-note" id="saveCalendarNote"></div>
   </div>
 
   <footer>Each click picks a random meal (respecting filters) and fills the next empty day. Use blockers to skip main dish, side, or vegetable for any day.</footer>
-  
-  <!-- Recipe Panel (expandable) -->
+
   <div class="recipe-panel" id="recipePanel">
     <div class="recipe-header">
       <h3 id="recipeTitle">Recipe</h3>
       <button class="recipe-close-btn" id="closeRecipeBtn">&times;</button>
     </div>
-    <div class="recipe-content" id="recipeContent">
-      Select a dish above to view its recipe.
-    </div>
+    <div class="recipe-content" id="recipeContent">Select a dish above to view its recipe.</div>
   </div>
 
-  <!-- Grocery List Section -->
   <div class="grocery-section">
     <button class="grocery-toggle-btn" id="groceryToggleBtn">
       <span class="toggle-icon">🛒</span> Grocery List <span id="groceryItemCount" class="grocery-count">0</span>
@@ -119,9 +109,7 @@
         <button class="btn btn-secondary btn-small" id="generateGroceryBtn">Generate List from Plan</button>
       </div>
       <div class="grocery-list-container" id="groceryListContainer">
-        <div id="groceryCategoriesContainer">
-          <!-- Categories and items injected here -->
-        </div>
+        <div id="groceryCategoriesContainer"></div>
       </div>
       <div class="grocery-footer">
         <button class="btn btn-secondary" id="clearGroceryBtn">Clear All</button>

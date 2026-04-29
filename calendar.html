@@ -11,11 +11,11 @@
 </head>
 <body>
 <div class="container">
-  <!-- Navigation -->
   <nav class="main-nav">
-    <a href="index.html" class="nav-link">Weekly Randomizer</a>
-    <a href="calendar.html" class="nav-link active">Calendar Planner</a>
-  </nav>
+  <a href="index.html" class="nav-link active">Weekly Randomizer</a>
+  <a href="calendar.html" class="nav-link">Calendar Planner</a>
+  <a href="budget.html" class="nav-link">Budget Tracker</a>
+</nav>
 
   <div class="title-card">
     <div class="logo-area">
@@ -25,7 +25,6 @@
     <p class="tagline">Plan your dinners for any date — past, present, or future</p>
   </div>
 
-  <!-- Calendar Controls -->
   <div class="calendar-controls">
     <div class="month-nav">
       <button class="btn btn-secondary btn-small" id="prevMonthBtn">← Prev</button>
@@ -41,23 +40,18 @@
     </div>
   </div>
 
-  <!-- Selection status bar -->
   <div class="selection-status" id="selectionStatus" style="display: none;">
     <span id="selectedCount">0</span> day(s) selected.
     <button class="btn-text" id="clearSelectionBtn">Clear selection</button>
   </div>
 
-  <!-- Calendar Grid -->
   <div class="calendar-wrapper">
     <div class="calendar-header">
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
-    <div class="calendar-grid" id="calendarGrid">
-      <!-- Days injected via JS -->
-    </div>
+    <div class="calendar-grid" id="calendarGrid"></div>
   </div>
 
-  <!-- Day Detail Panel -->
   <div class="day-detail-panel" id="dayDetailPanel">
     <div class="day-detail-header">
       <h3 id="selectedDateDisplay">Select a date</h3>
@@ -66,17 +60,11 @@
     <div class="day-detail-content" id="dayDetailContent">
       <div class="meal-form">
         <label>Main Dish:</label>
-        <select id="mainSelect" class="meal-select">
-          <option value="">— Select Main —</option>
-        </select>
+        <select id="mainSelect" class="meal-select"><option value="">— Select Main —</option></select>
         <label>Side:</label>
-        <select id="sideSelect" class="meal-select">
-          <option value="">— Select Side —</option>
-        </select>
+        <select id="sideSelect" class="meal-select"><option value="">— Select Side —</option></select>
         <label>Vegetable:</label>
-        <select id="vegSelect" class="meal-select">
-          <option value="">— Select Vegetable —</option>
-        </select>
+        <select id="vegSelect" class="meal-select"><option value="">— Select Vegetable —</option></select>
         <div class="form-actions">
           <button class="btn btn-primary btn-small" id="saveMealBtn">Save Meal</button>
           <button class="btn btn-secondary btn-small" id="clearMealBtn">Clear</button>
@@ -89,18 +77,14 @@
     </div>
   </div>
 
-  <!-- Recipe Panel -->
   <div class="recipe-panel" id="recipePanel">
     <div class="recipe-header">
       <h3 id="recipeTitle">Recipe</h3>
       <button class="recipe-close-btn" id="closeRecipeBtn">&times;</button>
     </div>
-    <div class="recipe-content" id="recipeContent">
-      Select a dish above to view its recipe.
-    </div>
+    <div class="recipe-content" id="recipeContent">Select a dish above to view its recipe.</div>
   </div>
 
-  <!-- Grocery List Section (collapsible) -->
   <div class="grocery-section">
     <button class="grocery-toggle-btn" id="groceryToggleBtn">
       <span class="toggle-icon">🛒</span> Grocery List <span id="groceryItemCount" class="grocery-count">0</span>
@@ -110,9 +94,7 @@
         <h3>Shopping List</h3>
       </div>
       <div class="grocery-list-container" id="groceryListContainer">
-        <div id="groceryCategoriesContainer">
-          <!-- Categories and items injected here -->
-        </div>
+        <div id="groceryCategoriesContainer"></div>
       </div>
       <div class="grocery-footer">
         <button class="btn btn-secondary" id="clearGroceryBtn">Clear List</button>

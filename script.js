@@ -288,9 +288,8 @@ function getRecipeText(dishName) {
 }
 
 // --------------------------------------------------------------
-// GROCERY LIST CATEGORIZATION & QUANTITY PARSING
+// GROCERY LIST CATEGORIZATION & PARSING
 // --------------------------------------------------------------
-
 const CATEGORY_KEYWORDS = {
   'Meat & Seafood': ['chicken', 'beef', 'pork', 'salmon', 'shrimp', 'cod', 'sausage', 'tenderloin', 'steak', 'ground', 'thighs', 'breast', 'pepperoni', 'dumpling', 'andouille'],
   'Produce': ['onion', 'garlic', 'lemon', 'herbs', 'rosemary', 'thyme', 'bell pepper', 'carrot', 'broccoli', 'cauliflower', 'string bean', 'parsnip', 'ginger', 'cilantro', 'lime', 'corn', 'mixed greens', 'tomato', 'cucumber', 'dill', 'potato', 'sweet potato'],
@@ -301,9 +300,7 @@ const CATEGORY_KEYWORDS = {
 function getCategory(ingredientName) {
   const lowerName = ingredientName.toLowerCase();
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (keywords.some(kw => lowerName.includes(kw))) {
-      return category;
-    }
+    if (keywords.some(kw => lowerName.includes(kw))) return category;
   }
   return 'Other';
 }
@@ -315,11 +312,7 @@ function parseQuantity(qtyStr) {
   const unit = match[2] || '';
   if (value.includes('/')) {
     const parts = value.split('/');
-    if (parts.length === 2) {
-      value = parseFloat(parts[0]) / parseFloat(parts[1]);
-    } else {
-      value = parseFloat(value);
-    }
+    value = parts.length === 2 ? parseFloat(parts[0]) / parseFloat(parts[1]) : parseFloat(value);
   } else {
     value = parseFloat(value);
   }
@@ -334,7 +327,6 @@ function formatQuantity(value, unit) {
 // --------------------------------------------------------------
 // WEEKLY PLAN & STATE
 // --------------------------------------------------------------
-
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TOTAL_DAYS = 7;
 
@@ -342,11 +334,8 @@ let weeklyPlan = new Array(TOTAL_DAYS).fill(null);
 let nextFillIndex = 0;
 let dayCells = { main: [], side: [], veg: [] };
 let blockerCheckboxes = [];
-
-// Grocery state
 let currentGroceryItems = [];
 
-// DOM elements
 const generateBtn = document.getElementById("generateBtn");
 const resetBtn = document.getElementById("resetBtn");
 const feedbackDiv = document.getElementById("feedbackMsg");
@@ -367,15 +356,14 @@ const filtersCard = document.getElementById("filtersCard");
 filterToggleBtn.addEventListener("click", () => {
   filtersCard.classList.toggle("show");
   filterToggleBtn.classList.toggle("open");
-  const icon = filterToggleBtn.querySelector(".toggle-icon");
-  icon.textContent = filtersCard.classList.contains("show") ? "▲" : "▼";
+  filterToggleBtn.querySelector(".toggle-icon").textContent =
+    filtersCard.classList.contains("show") ? "▲" : "▼";
 });
 
-// Recipe panel
 const recipePanel = document.getElementById('recipePanel');
 const recipeTitle = document.getElementById('recipeTitle');
 const recipeContent = document.getElementById('recipeContent');
-const closeRecipeBtn = document.getElementById('closeRecipeBtn');
+document.getElementById('closeRecipeBtn').addEventListener('click', () => recipePanel.classList.remove('show'));
 
 function showRecipe(dishName, category) {
   recipeTitle.textContent = `${dishName} (${category})`;
@@ -383,10 +371,7 @@ function showRecipe(dishName, category) {
   recipePanel.classList.add('show');
   recipePanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
-function hideRecipe() { recipePanel.classList.remove('show'); }
-closeRecipeBtn.addEventListener('click', hideRecipe);
 
-// Grocery elements
 const groceryToggleBtn = document.getElementById('groceryToggleBtn');
 const groceryPanel = document.getElementById('groceryPanel');
 const groceryItemCount = document.getElementById('groceryItemCount');
@@ -394,14 +379,11 @@ const generateGroceryBtn = document.getElementById('generateGroceryBtn');
 const clearGroceryBtn = document.getElementById('clearGroceryBtn');
 const groceryCategoriesContainer = document.getElementById('groceryCategoriesContainer');
 
-groceryToggleBtn.addEventListener('click', () => {
-  groceryPanel.classList.toggle('show');
-});
+groceryToggleBtn.addEventListener('click', () => groceryPanel.classList.toggle('show'));
 
 function generateGroceryList() {
   const ingredientMap = new Map();
-  
-  weeklyPlan.forEach((meal) => {
+  weeklyPlan.forEach(meal => {
     if (!meal) return;
     const dishes = [
       { name: meal.main, blocked: meal.main === "[Blocked]" },
@@ -415,31 +397,26 @@ function generateGroceryList() {
       recipe.ingredients.forEach(ing => {
         const parsed = parseQuantity(ing.quantity);
         if (!parsed) return;
-        const unit = parsed.unit;
-        const key = `${ing.name.toLowerCase()}|${unit}`;
+        const key = `${ing.name.toLowerCase()}|${parsed.unit}`;
         if (ingredientMap.has(key)) {
-          const existing = ingredientMap.get(key);
-          existing.quantityValue += parsed.value;
+          ingredientMap.get(key).quantityValue += parsed.value;
         } else {
           ingredientMap.set(key, {
             name: ing.name,
             quantityValue: parsed.value,
-            unit: unit,
+            unit: parsed.unit,
             category: getCategory(ing.name)
           });
         }
       });
     });
   });
-  
-  const items = Array.from(ingredientMap.values()).map((item, index) => ({
+  currentGroceryItems = Array.from(ingredientMap.values()).map((item, index) => ({
     id: `groc-${Date.now()}-${index}`,
     name: item.name,
     quantity: formatQuantity(item.quantityValue, item.unit),
     category: item.category
   }));
-  
-  currentGroceryItems = items;
   renderGroceryList();
 }
 
@@ -449,74 +426,44 @@ function renderGroceryList() {
     groceryItemCount.textContent = '0';
     return;
   }
-  
   const categories = {};
   currentGroceryItems.forEach(item => {
     if (!categories[item.category]) categories[item.category] = [];
     categories[item.category].push(item);
   });
-  
   const categoryOrder = ['Meat & Seafood', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
-  
   let html = '';
   for (const cat of categoryOrder) {
-    if (categories[cat] && categories[cat].length > 0) {
-      html += `<div class="grocery-category">`;
-      html += `<div class="grocery-category-title">${cat}</div>`;
-      html += `<ul class="grocery-list">`;
+    if (categories[cat]) {
+      html += `<div class="grocery-category"><div class="grocery-category-title">${cat}</div><ul class="grocery-list">`;
       categories[cat].forEach(item => {
-        html += `
-          <li class="grocery-item" data-id="${item.id}">
-            <div class="grocery-item-info">
-              <span class="grocery-item-name">${item.name}</span>
-              <span class="grocery-item-quantity" data-id="${item.id}">${item.quantity}</span>
-            </div>
-            <div class="grocery-item-actions">
-              <button class="grocery-remove-btn" data-id="${item.id}" title="Remove item">✕</button>
-            </div>
-          </li>
-        `;
+        html += `<li class="grocery-item" data-id="${item.id}">
+          <div class="grocery-item-info"><span class="grocery-item-name">${item.name}</span><span class="grocery-item-quantity" data-id="${item.id}">${item.quantity}</span></div>
+          <div class="grocery-item-actions"><button class="grocery-remove-btn" data-id="${item.id}" title="Remove item">✕</button></div>
+        </li>`;
       });
-      html += `</ul></div>`;
+      html += '</ul></div>';
+      delete categories[cat];
     }
   }
   Object.keys(categories).forEach(cat => {
-    if (!categoryOrder.includes(cat) && categories[cat].length > 0) {
-      html += `<div class="grocery-category">`;
-      html += `<div class="grocery-category-title">${cat}</div>`;
-      html += `<ul class="grocery-list">`;
-      categories[cat].forEach(item => {
-        html += `
-          <li class="grocery-item" data-id="${item.id}">
-            <div class="grocery-item-info">
-              <span class="grocery-item-name">${item.name}</span>
-              <span class="grocery-item-quantity" data-id="${item.id}">${item.quantity}</span>
-            </div>
-            <div class="grocery-item-actions">
-              <button class="grocery-remove-btn" data-id="${item.id}" title="Remove item">✕</button>
-            </div>
-          </li>
-        `;
-      });
-      html += `</ul></div>`;
-    }
+    html += `<div class="grocery-category"><div class="grocery-category-title">${cat}</div><ul class="grocery-list">`;
+    categories[cat].forEach(item => {
+      html += `<li class="grocery-item" data-id="${item.id}">
+        <div class="grocery-item-info"><span class="grocery-item-name">${item.name}</span><span class="grocery-item-quantity" data-id="${item.id}">${item.quantity}</span></div>
+        <div class="grocery-item-actions"><button class="grocery-remove-btn" data-id="${item.id}" title="Remove item">✕</button></div>
+      </li>`;
+    });
+    html += '</ul></div>';
   });
-  
   groceryCategoriesContainer.innerHTML = html;
   groceryItemCount.textContent = currentGroceryItems.length;
-  
+
   document.querySelectorAll('.grocery-remove-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const id = btn.dataset.id;
-      removeGroceryItem(id);
-    });
+    btn.addEventListener('click', () => removeGroceryItem(btn.dataset.id));
   });
-  
   document.querySelectorAll('.grocery-item-quantity').forEach(span => {
-    span.addEventListener('click', (e) => {
-      const id = span.dataset.id;
-      makeQuantityEditable(span, id);
-    });
+    span.addEventListener('click', () => makeQuantityEditable(span, span.dataset.id));
   });
 }
 
@@ -531,9 +478,7 @@ function makeQuantityEditable(span, id) {
   input.type = 'text';
   input.value = currentQuantity;
   input.addEventListener('blur', () => updateQuantity(id, input.value));
-  input.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') updateQuantity(id, input.value);
-  });
+  input.addEventListener('keypress', e => { if (e.key === 'Enter') updateQuantity(id, input.value); });
   span.innerHTML = '';
   span.appendChild(input);
   input.focus();
@@ -554,9 +499,8 @@ generateGroceryBtn.addEventListener('click', generateGroceryList);
 clearGroceryBtn.addEventListener('click', clearGroceryList);
 
 // --------------------------------------------------------------
-// FILTER & RANDOMIZATION FUNCTIONS
+// FILTER & RANDOMIZATION
 // --------------------------------------------------------------
-
 function getSelectedMeats() {
   const selected = [];
   if (filterChicken.checked) selected.push("chicken");
@@ -567,8 +511,8 @@ function getSelectedMeats() {
 }
 
 function getFilteredMains(selectedMeats) {
-  if (selectedMeats.length === 0) return MAIN_DISHES.filter(dish => dish.meats.length > 0);
-  return MAIN_DISHES.filter(dish => dish.meats.some(meat => selectedMeats.includes(meat)));
+  if (selectedMeats.length === 0) return MAIN_DISHES.filter(d => d.meats.length > 0);
+  return MAIN_DISHES.filter(d => d.meats.some(m => selectedMeats.includes(m)));
 }
 
 function getSelectedVeggies() {
@@ -582,7 +526,7 @@ function getSelectedVeggies() {
 
 function getFilteredVeggies(selectedVeggies) {
   if (selectedVeggies.length === 0) return [...VEGETABLES];
-  return VEGETABLES.filter(veg => veg.vegTypes.some(vtype => selectedVeggies.includes(vtype)));
+  return VEGETABLES.filter(v => v.vegTypes.some(t => selectedVeggies.includes(t)));
 }
 
 function getRandomMain() {
@@ -607,7 +551,6 @@ function checkEligibility() {
 // --------------------------------------------------------------
 // TABLE BUILDING & SYNC
 // --------------------------------------------------------------
-
 function buildTable() {
   const tbody = document.getElementById("tableBody");
   tbody.innerHTML = "";
@@ -662,10 +605,19 @@ function buildTable() {
     blockerDiv.appendChild(vegLabel);
     blockerTd.appendChild(blockerDiv);
 
+    const actionTd = document.createElement("td");
+    actionTd.className = "action-cell";
+    const clearBtn = document.createElement("button");
+    clearBtn.className = "clear-day-btn";
+    clearBtn.textContent = "Clear Day";
+    clearBtn.addEventListener('click', () => clearSpecificDay(i));
+    actionTd.appendChild(clearBtn);
+
     row.appendChild(mainTd);
     row.appendChild(sideTd);
     row.appendChild(vegTd);
     row.appendChild(blockerTd);
+    row.appendChild(actionTd);
     tbody.appendChild(row);
 
     dayCells.main.push(mainTd);
@@ -676,6 +628,29 @@ function buildTable() {
   syncTableFromPlan();
 }
 
+function clearSpecificDay(index) {
+  if (weeklyPlan[index] !== null) {
+    weeklyPlan[index] = null;
+    blockerCheckboxes[index].main.checked = false;
+    blockerCheckboxes[index].side.checked = false;
+    blockerCheckboxes[index].veg.checked = false;
+    updateNextFillIndex();
+    syncTableFromPlan();
+    feedbackDiv.innerHTML = `${WEEKDAYS[index]} cleared. Next fill will be ${WEEKDAYS[nextFillIndex]}.`;
+    feedbackDiv.style.background = "#eef4eb";
+    feedbackDiv.style.color = "#2b6e3c";
+  } else {
+    feedbackDiv.innerHTML = `${WEEKDAYS[index]} is already empty.`;
+    feedbackDiv.style.background = "#fff0e5";
+    feedbackDiv.style.color = "#b45309";
+  }
+}
+
+function updateNextFillIndex() {
+  nextFillIndex = weeklyPlan.findIndex(meal => meal === null);
+  if (nextFillIndex === -1) nextFillIndex = TOTAL_DAYS;
+}
+
 function syncTableFromPlan() {
   if (dayCells.main.length === 0) buildTable();
   for (let i = 0; i < TOTAL_DAYS; i++) {
@@ -683,63 +658,34 @@ function syncTableFromPlan() {
     const mainCell = dayCells.main[i];
     const sideCell = dayCells.side[i];
     const vegCell = dayCells.veg[i];
-    
     if (meal) {
-      if (meal.main !== "[Blocked]") {
-        mainCell.textContent = meal.main;
-        mainCell.classList.add('clickable');
-        mainCell.onclick = () => showRecipe(meal.main, 'Main Dish');
-      } else {
-        mainCell.textContent = meal.main;
-        mainCell.classList.remove('clickable');
-        mainCell.onclick = null;
-      }
-      mainCell.classList.remove("empty-meal");
-      
-      if (meal.side !== "[Blocked]") {
-        sideCell.textContent = meal.side;
-        sideCell.classList.add('clickable');
-        sideCell.onclick = () => showRecipe(meal.side, 'Side');
-      } else {
-        sideCell.textContent = meal.side;
-        sideCell.classList.remove('clickable');
-        sideCell.onclick = null;
-      }
-      sideCell.classList.remove("empty-meal");
-      
-      if (meal.veg !== "[Blocked]") {
-        vegCell.textContent = meal.veg;
-        vegCell.classList.add('clickable');
-        vegCell.onclick = () => showRecipe(meal.veg, 'Vegetable');
-      } else {
-        vegCell.textContent = meal.veg;
-        vegCell.classList.remove('clickable');
-        vegCell.onclick = null;
-      }
-      vegCell.classList.remove("empty-meal");
-      
+      setCell(mainCell, meal.main, 'Main Dish');
+      setCell(sideCell, meal.side, 'Side');
+      setCell(vegCell, meal.veg, 'Vegetable');
     } else {
-      mainCell.textContent = "— not assigned —";
-      mainCell.classList.add("empty-meal");
-      mainCell.classList.remove('clickable');
-      mainCell.onclick = null;
-      
-      sideCell.textContent = "— not assigned —";
-      sideCell.classList.add("empty-meal");
-      sideCell.classList.remove('clickable');
-      sideCell.onclick = null;
-      
-      vegCell.textContent = "— not assigned —";
-      vegCell.classList.add("empty-meal");
-      vegCell.classList.remove('clickable');
-      vegCell.onclick = null;
+      setCell(mainCell, "— not assigned —");
+      setCell(sideCell, "— not assigned —");
+      setCell(vegCell, "— not assigned —");
     }
+  }
+}
+
+function setCell(cell, text, category) {
+  cell.textContent = text;
+  cell.classList.remove('clickable', 'empty-meal');
+  cell.onclick = null;
+  if (text && text !== "[Blocked]" && text !== "— not assigned —") {
+    cell.classList.add('clickable');
+    cell.onclick = () => showRecipe(text, category);
+  } else if (text === "— not assigned —") {
+    cell.classList.add('empty-meal');
   }
 }
 
 function resetWeeklyPlan() {
   weeklyPlan = new Array(TOTAL_DAYS).fill(null);
   nextFillIndex = 0;
+  blockerCheckboxes.forEach(cb => { cb.main.checked = false; cb.side.checked = false; cb.veg.checked = false; });
   syncTableFromPlan();
   feedbackDiv.innerHTML = "Weekly plan cleared. Use 'Generate' to start filling from Monday.";
   feedbackDiv.style.background = "#eef4eb";
@@ -756,8 +702,6 @@ function generateAndFillNextDay() {
 
   const idx = nextFillIndex;
   const blockers = blockerCheckboxes[idx];
-  if (!blockers) return false;
-
   const blockMain = blockers.main.checked;
   const blockSide = blockers.side.checked;
   const blockVeg = blockers.veg.checked;
@@ -798,11 +742,9 @@ function generateAndFillNextDay() {
     return false;
   }
 
-  const newMeal = { main: mainChoice, side: sideChoice, veg: vegChoice };
-  weeklyPlan[idx] = newMeal;
+  weeklyPlan[idx] = { main: mainChoice, side: sideChoice, veg: vegChoice };
   const currentDay = WEEKDAYS[idx];
-  nextFillIndex++;
-  
+  updateNextFillIndex();
   syncTableFromPlan();
 
   const remaining = TOTAL_DAYS - nextFillIndex;
@@ -811,7 +753,7 @@ function generateAndFillNextDay() {
     feedbackDiv.style.background = "#dcfce7";
     feedbackDiv.style.color = "#166534";
   } else {
-    feedbackDiv.innerHTML = `Added to ${currentDay}: ${mainChoice} | ${sideChoice} | ${vegChoice} · ${remaining} day${remaining !== 1 ? 's' : ''} left.`;
+    feedbackDiv.innerHTML = `Added to ${currentDay}: ${mainChoice} | ${sideChoice} | ${vegChoice} · ${remaining} day(s) left.`;
     feedbackDiv.style.background = "#eef4eb";
     feedbackDiv.style.color = "#2b6e3c";
   }
@@ -819,49 +761,39 @@ function generateAndFillNextDay() {
 }
 
 // --------------------------------------------------------------
-// SAVE WEEK TO CALENDAR FUNCTIONALITY
+// SAVE WEEK TO CALENDAR
 // --------------------------------------------------------------
 const saveWeekToCalendarBtn = document.getElementById('saveWeekToCalendarBtn');
 const saveCalendarNote = document.getElementById('saveCalendarNote');
 
 function formatDateForStorage(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
 function getLastSavedWeekStart() {
   const saved = localStorage.getItem('realMealPlan_lastSavedWeekStart');
-  if (saved) return new Date(saved + 'T12:00:00');
-  return null;
+  return saved ? new Date(saved + 'T12:00:00') : null;
 }
-
 function setLastSavedWeekStart(date) {
   localStorage.setItem('realMealPlan_lastSavedWeekStart', formatDateForStorage(date));
 }
 
 function getNextMondayAfter(date) {
-  const nextMonday = new Date(date);
-  const daysUntilMonday = (8 - date.getDay()) % 7 || 7;
-  nextMonday.setDate(date.getDate() + daysUntilMonday);
-  return nextMonday;
+  const next = new Date(date);
+  next.setDate(next.getDate() + ((8 - next.getDay()) % 7 || 7));
+  return next;
 }
 
 function getSuggestedStartDate() {
-  const lastStart = getLastSavedWeekStart();
-  if (lastStart) {
-    return getNextMondayAfter(lastStart);
-  } else {
-    const today = new Date();
-    return getNextMondayAfter(today);
-  }
+  const last = getLastSavedWeekStart();
+  return last ? getNextMondayAfter(last) : getNextMondayAfter(new Date());
 }
 
 function showDatePickerModal(callback) {
-  const defaultDate = getSuggestedStartDate();
-  const defaultStr = formatDateForStorage(defaultDate);
-  
+  const defaultStr = formatDateForStorage(getSuggestedStartDate());
   const modalHtml = `
     <div class="modal-overlay" id="datePickerModal">
       <div class="modal-content">
@@ -873,57 +805,41 @@ function showDatePickerModal(callback) {
           <button class="btn btn-primary" id="confirmModalBtn">Save</button>
         </div>
       </div>
-    </div>
-  `;
-  
+    </div>`;
   document.body.insertAdjacentHTML('beforeend', modalHtml);
   const modal = document.getElementById('datePickerModal');
   const input = document.getElementById('startDateInput');
   const cancelBtn = document.getElementById('cancelModalBtn');
   const confirmBtn = document.getElementById('confirmModalBtn');
-  
   const closeModal = () => modal.remove();
-  
   cancelBtn.addEventListener('click', closeModal);
   confirmBtn.addEventListener('click', () => {
     const selectedDate = new Date(input.value + 'T12:00:00');
     closeModal();
     callback(selectedDate);
   });
-  
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) closeModal();
-  });
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 }
 
 function saveWeekToCalendar(startDate) {
   const calendarData = JSON.parse(localStorage.getItem('realMealPlan_calendar')) || {};
-  
   let savedCount = 0;
   for (let i = 0; i < WEEKDAYS.length; i++) {
     const meal = weeklyPlan[i];
     if (!meal) continue;
-    
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
     const dateStr = formatDateForStorage(date);
-    
     const mainDish = meal.main === "[Blocked]" ? "" : meal.main;
     const sideDish = meal.side === "[Blocked]" ? "" : meal.side;
     const vegDish = meal.veg === "[Blocked]" ? "" : meal.veg;
-    
     if (mainDish || sideDish || vegDish) {
-      calendarData[dateStr] = {
-        main: mainDish,
-        side: sideDish,
-        veg: vegDish
-      };
+      calendarData[dateStr] = { main: mainDish, side: sideDish, veg: vegDish };
       savedCount++;
     } else {
       delete calendarData[dateStr];
     }
   }
-  
   localStorage.setItem('realMealPlan_calendar', JSON.stringify(calendarData));
   setLastSavedWeekStart(startDate);
   return savedCount;
@@ -937,8 +853,7 @@ saveWeekToCalendarBtn.addEventListener('click', () => {
     setTimeout(() => saveCalendarNote.textContent = '', 3000);
     return;
   }
-  
-  showDatePickerModal((startDate) => {
+  showDatePickerModal(startDate => {
     const count = saveWeekToCalendar(startDate);
     saveCalendarNote.textContent = `Saved ${count} days to calendar starting ${startDate.toLocaleDateString()}.`;
     saveCalendarNote.style.color = '#166534';
@@ -949,21 +864,17 @@ saveWeekToCalendarBtn.addEventListener('click', () => {
 // --------------------------------------------------------------
 // EVENT BINDING & INIT
 // --------------------------------------------------------------
-
 function bindEvents() {
-  generateBtn.addEventListener("click", () => generateAndFillNextDay());
-  resetBtn.addEventListener("click", () => {
+  generateBtn.addEventListener('click', generateAndFillNextDay);
+  resetBtn.addEventListener('click', () => {
     resetWeeklyPlan();
     feedbackDiv.innerHTML = "Weekly menu cleared! Start generating from Monday again.";
     feedbackDiv.style.background = "#eef4eb";
     feedbackDiv.style.color = "#2b6e3c";
   });
-  const filterInputs = [
-    filterChicken, filterBeef, filterPork, filterFish,
-    filterPeppers, filterBroccoli, filterCarrots, filterStringBeans
-  ];
+  const filterInputs = [filterChicken, filterBeef, filterPork, filterFish, filterPeppers, filterBroccoli, filterCarrots, filterStringBeans];
   filterInputs.forEach(input => {
-    input.addEventListener("change", () => {
+    input.addEventListener('change', () => {
       if (nextFillIndex < TOTAL_DAYS) {
         feedbackDiv.innerHTML = `Filters updated · Next meal will respect new selections. ${nextFillIndex} day(s) filled.`;
         feedbackDiv.style.background = "#eef2ff";

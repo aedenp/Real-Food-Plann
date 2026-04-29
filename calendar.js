@@ -290,6 +290,7 @@ function getRecipeText(dishName) {
 // --------------------------------------------------------------
 // GROCERY LIST CATEGORIZATION & PARSING
 // --------------------------------------------------------------
+
 const CATEGORY_KEYWORDS = {
   'Meat & Seafood': ['chicken', 'beef', 'pork', 'salmon', 'shrimp', 'cod', 'sausage', 'tenderloin', 'steak', 'ground', 'thighs', 'breast', 'pepperoni', 'dumpling', 'andouille'],
   'Produce': ['onion', 'garlic', 'lemon', 'herbs', 'rosemary', 'thyme', 'bell pepper', 'carrot', 'broccoli', 'cauliflower', 'string bean', 'parsnip', 'ginger', 'cilantro', 'lime', 'corn', 'mixed greens', 'tomato', 'cucumber', 'dill', 'potato', 'sweet potato'],
@@ -300,7 +301,9 @@ const CATEGORY_KEYWORDS = {
 function getCategory(ingredientName) {
   const lowerName = ingredientName.toLowerCase();
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (keywords.some(kw => lowerName.includes(kw))) return category;
+    if (keywords.some(kw => lowerName.includes(kw))) {
+      return category;
+    }
   }
   return 'Other';
 }
@@ -312,8 +315,11 @@ function parseQuantity(qtyStr) {
   const unit = match[2] || '';
   if (value.includes('/')) {
     const parts = value.split('/');
-    if (parts.length === 2) value = parseFloat(parts[0]) / parseFloat(parts[1]);
-    else value = parseFloat(value);
+    if (parts.length === 2) {
+      value = parseFloat(parts[0]) / parseFloat(parts[1]);
+    } else {
+      value = parseFloat(value);
+    }
   } else {
     value = parseFloat(value);
   }
@@ -328,15 +334,17 @@ function formatQuantity(value, unit) {
 // --------------------------------------------------------------
 // CALENDAR STATE
 // --------------------------------------------------------------
+
 let currentDate = new Date();
 let selectedDate = null;
-let mealPlans = {};
+let mealPlans = {}; // key: "YYYY-MM-DD"
 let selectMode = false;
 let selectedDates = new Set();
 
 // Grocery state
 let currentGroceryItems = [];
 
+// Load / save
 function loadMealPlans() {
   const saved = localStorage.getItem('realMealPlan_calendar');
   if (saved) {
@@ -386,7 +394,10 @@ groceryToggleBtn.addEventListener('click', () => {
   groceryPanel.classList.toggle('show');
 });
 
-// Populate dropdowns
+// --------------------------------------------------------------
+// DROPDOWNS & RECIPE
+// --------------------------------------------------------------
+
 function populateDropdowns() {
   mainSelect.innerHTML = '<option value="">— Select Main —</option>';
   MAIN_DISHES.forEach(d => { mainSelect.innerHTML += `<option value="${d.name}">${d.name}</option>`; });
@@ -397,7 +408,6 @@ function populateDropdowns() {
 }
 populateDropdowns();
 
-// Recipe panel
 function showRecipe(dishName) {
   recipeTitle.textContent = dishName;
   recipeContent.textContent = getRecipeText(dishName);
@@ -405,13 +415,16 @@ function showRecipe(dishName) {
 }
 closeRecipeBtn.addEventListener('click', () => recipePanel.classList.remove('show'));
 
-// Calendar rendering
+// --------------------------------------------------------------
+// CALENDAR RENDERING
+// --------------------------------------------------------------
+
 function renderCalendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth();
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  const startDay = firstDay.getDay();
+  const startDay = firstDay.getDay(); // 0 = Sunday
   const daysInMonth = lastDay.getDate();
   
   const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -451,7 +464,7 @@ function renderCalendar() {
   document.querySelectorAll('.calendar-day').forEach(el => {
     el.addEventListener('click', (e) => {
       const dateStr = el.dataset.date;
-      handleDayClick(dateStr, el);
+      handleDayClick(dateStr);
     });
   });
   
@@ -479,7 +492,7 @@ function abbreviate(str, maxLen) {
   return str.substring(0, maxLen-3) + '...';
 }
 
-function handleDayClick(dateStr, element) {
+function handleDayClick(dateStr) {
   if (selectMode) {
     if (selectedDates.has(dateStr)) {
       selectedDates.delete(dateStr);
@@ -491,6 +504,10 @@ function handleDayClick(dateStr, element) {
     openDayDetail(dateStr);
   }
 }
+
+// --------------------------------------------------------------
+// DAY DETAIL PANEL
+// --------------------------------------------------------------
 
 function openDayDetail(dateStr) {
   selectedDate = dateStr;
@@ -526,12 +543,17 @@ function saveCurrentMeal() {
   closeDayDetail();
 }
 saveMealBtn.addEventListener('click', saveCurrentMeal);
+
 clearMealBtn.addEventListener('click', () => {
   mainSelect.value = '';
   sideSelect.value = '';
   vegSelect.value = '';
   saveCurrentMeal();
 });
+
+// --------------------------------------------------------------
+// RANDOM FILL WEEK
+// --------------------------------------------------------------
 
 fillWeekBtn.addEventListener('click', () => {
   if (!selectedDate) {
@@ -556,7 +578,10 @@ fillWeekBtn.addEventListener('click', () => {
   closeDayDetail();
 });
 
-// Selection mode
+// --------------------------------------------------------------
+// SELECTION MODE & MANAGEMENT
+// --------------------------------------------------------------
+
 function setSelectMode(enabled) {
   selectMode = enabled;
   selectModeToggle.classList.toggle('active', enabled);
@@ -603,6 +628,7 @@ clearAllCalendarBtn.addEventListener('click', () => {
 // --------------------------------------------------------------
 // GROCERY LIST FROM SELECTED DAYS
 // --------------------------------------------------------------
+
 function generateGroceryListFromSelected() {
   if (selectedDates.size === 0) {
     alert('Please select at least one day using Select Mode first.');
@@ -755,7 +781,10 @@ function clearGroceryList() {
 groceryForWeekBtn.addEventListener('click', generateGroceryListFromSelected);
 clearGroceryBtn.addEventListener('click', clearGroceryList);
 
-// Navigation
+// --------------------------------------------------------------
+// NAVIGATION & INIT
+// --------------------------------------------------------------
+
 prevMonthBtn.addEventListener('click', () => {
   currentDate.setMonth(currentDate.getMonth() - 1);
   renderCalendar();
@@ -769,7 +798,6 @@ todayBtn.addEventListener('click', () => {
   renderCalendar();
 });
 
-// Logo fallback
 document.getElementById('logoImage').onerror = function() { this.style.display = 'none'; };
 
 renderCalendar();
