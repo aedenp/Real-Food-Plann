@@ -119,23 +119,17 @@ prevWeekBtn.addEventListener('click', () => {
   displayedWeekStart.setDate(displayedWeekStart.getDate() - 7);
   renderDayStrip();
   const sel = new Date(receiptDateHidden.value + 'T12:00:00');
-<<<<<<< HEAD:js/budget.js
   if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7 * 86400000)) {
-=======
-  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7*86400000))
->>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
     receiptDateHidden.value = formatDate(displayedWeekStart);
+  }
 });
 nextWeekBtn.addEventListener('click', () => {
   displayedWeekStart.setDate(displayedWeekStart.getDate() + 7);
   renderDayStrip();
   const sel = new Date(receiptDateHidden.value + 'T12:00:00');
-<<<<<<< HEAD:js/budget.js
   if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7 * 86400000)) {
-=======
-  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7*86400000))
->>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
     receiptDateHidden.value = formatDate(displayedWeekStart);
+  }
 });
 thisWeekBtn.addEventListener('click', () => {
   displayedWeekStart = getMonday(new Date());
@@ -220,11 +214,8 @@ function getWeekExpenses(monday) {
 
 // ---------- AVERAGES & ANNUAL TOTAL ----------
 function updateAverages() {
-<<<<<<< HEAD:js/budget.js
   const total = expenses.reduce((sum, exp) => sum + exp.total, 0);
 
-=======
->>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
   const weekSet = new Set();
   expenses.forEach(exp => {
     const monday = getMonday(new Date(exp.date + 'T12:00:00'));
@@ -280,11 +271,9 @@ function renderExpenseTable() {
       <td>${breakdownStr}</td><td><button class="clear-day-btn" onclick="deleteExpense(${exp.id})">Delete</button></td>
     </tr>`;
   }).join('');
-<<<<<<< HEAD:js/budget.js
 
-=======
->>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
-  renderMonthlyTotalsTable();
+  // Update weekly chart after rendering table
+  updateWeeklyChart();
 }
 
 function renderMonthlyTotalsTable() {
@@ -443,15 +432,11 @@ deleteAllBtn.addEventListener('click', () => {
   }
 });
 
-<<<<<<< HEAD:js/budget.js
 // --------------------------------------------------------------
-// AUTH HOOK
+// AUTH HOOK – calls loadExpenses then refreshAll
 // --------------------------------------------------------------
 function onUserReady(userId) {
   loadExpenses(() => {
     refreshAll();
   });
 }
-=======
-refreshAll();
->>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
