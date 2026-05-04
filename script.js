@@ -288,8 +288,9 @@ function getRecipeText(dishName) {
 }
 
 // --------------------------------------------------------------
-// GROCERY LIST CATEGORIZATION & PARSING
+// GROCERY LIST CATEGORIZATION & QUANTITY PARSING
 // --------------------------------------------------------------
+
 const CATEGORY_KEYWORDS = {
   'Meat & Seafood': ['chicken', 'beef', 'pork', 'salmon', 'shrimp', 'cod', 'sausage', 'tenderloin', 'steak', 'ground', 'thighs', 'breast', 'pepperoni', 'dumpling', 'andouille'],
   'Produce': ['onion', 'garlic', 'lemon', 'herbs', 'rosemary', 'thyme', 'bell pepper', 'carrot', 'broccoli', 'cauliflower', 'string bean', 'parsnip', 'ginger', 'cilantro', 'lime', 'corn', 'mixed greens', 'tomato', 'cucumber', 'dill', 'potato', 'sweet potato'],
@@ -300,7 +301,9 @@ const CATEGORY_KEYWORDS = {
 function getCategory(ingredientName) {
   const lowerName = ingredientName.toLowerCase();
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (keywords.some(kw => lowerName.includes(kw))) return category;
+    if (keywords.some(kw => lowerName.includes(kw))) {
+      return category;
+    }
   }
   return 'Other';
 }
@@ -312,7 +315,11 @@ function parseQuantity(qtyStr) {
   const unit = match[2] || '';
   if (value.includes('/')) {
     const parts = value.split('/');
-    value = parts.length === 2 ? parseFloat(parts[0]) / parseFloat(parts[1]) : parseFloat(value);
+    if (parts.length === 2) {
+      value = parseFloat(parts[0]) / parseFloat(parts[1]);
+    } else {
+      value = parseFloat(value);
+    }
   } else {
     value = parseFloat(value);
   }
@@ -327,6 +334,7 @@ function formatQuantity(value, unit) {
 // --------------------------------------------------------------
 // WEEKLY PLAN & STATE
 // --------------------------------------------------------------
+
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TOTAL_DAYS = 7;
 
@@ -336,6 +344,7 @@ let dayCells = { main: [], side: [], veg: [] };
 let blockerCheckboxes = [];
 let currentGroceryItems = [];
 
+// DOM elements
 const generateBtn = document.getElementById("generateBtn");
 const resetBtn = document.getElementById("resetBtn");
 const feedbackDiv = document.getElementById("feedbackMsg");
@@ -636,6 +645,7 @@ function clearSpecificDay(index) {
     blockerCheckboxes[index].veg.checked = false;
     updateNextFillIndex();
     syncTableFromPlan();
+    saveCurrentWeekToStorage(); // <-- AUTO SAVE
     feedbackDiv.innerHTML = `${WEEKDAYS[index]} cleared. Next fill will be ${WEEKDAYS[nextFillIndex]}.`;
     feedbackDiv.style.background = "#eef4eb";
     feedbackDiv.style.color = "#2b6e3c";
@@ -687,6 +697,7 @@ function resetWeeklyPlan() {
   nextFillIndex = 0;
   blockerCheckboxes.forEach(cb => { cb.main.checked = false; cb.side.checked = false; cb.veg.checked = false; });
   syncTableFromPlan();
+  saveCurrentWeekToStorage(); // <-- AUTO SAVE
   feedbackDiv.innerHTML = "Weekly plan cleared. Use 'Generate' to start filling from Monday.";
   feedbackDiv.style.background = "#eef4eb";
   feedbackDiv.style.color = "#2b6e3c";
@@ -733,19 +744,14 @@ function generateAndFillNextDay() {
   const sideChoice = blockSide ? "[Blocked]" : getRandomSide();
   const vegChoice = blockVeg ? "[Blocked]" : getRandomVeg();
 
-  if (!blockMain && !mainChoice) {
-    feedbackDiv.innerHTML = "Error: No main dish available. Check protein filters.";
-    return false;
-  }
-  if (!blockVeg && !vegChoice) {
-    feedbackDiv.innerHTML = "Error: No vegetable available. Check veggie filters.";
-    return false;
-  }
+  if (!blockMain && !mainChoice) { feedbackDiv.innerHTML = "Error: No main dish available."; return false; }
+  if (!blockVeg && !vegChoice) { feedbackDiv.innerHTML = "Error: No vegetable available."; return false; }
 
   weeklyPlan[idx] = { main: mainChoice, side: sideChoice, veg: vegChoice };
   const currentDay = WEEKDAYS[idx];
   updateNextFillIndex();
   syncTableFromPlan();
+  saveCurrentWeekToStorage(); // <-- AUTO SAVE
 
   const remaining = TOTAL_DAYS - nextFillIndex;
   if (remaining === 0) {
@@ -761,21 +767,29 @@ function generateAndFillNextDay() {
 }
 
 // --------------------------------------------------------------
-// SAVE WEEK TO CALENDAR
+// SAVE CURRENT WEEK TO LOCAL STORAGE (for History page)
+// --------------------------------------------------------------
+function saveCurrentWeekToStorage() {
+  localStorage.setItem('realMealPlan_currentWeek', JSON.stringify(weeklyPlan));
+}
+
+// --------------------------------------------------------------
+// SAVE WEEK TO CALENDAR (existing)
 // --------------------------------------------------------------
 const saveWeekToCalendarBtn = document.getElementById('saveWeekToCalendarBtn');
 const saveCalendarNote = document.getElementById('saveCalendarNote');
 
 function formatDateForStorage(date) {
-  const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
-  return `${y}-${m}-${d}`;
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function getLastSavedWeekStart() {
   const saved = localStorage.getItem('realMealPlan_lastSavedWeekStart');
-  return saved ? new Date(saved + 'T12:00:00') : null;
+  if (saved) return new Date(saved + 'T12:00:00');
+  return null;
 }
 function setLastSavedWeekStart(date) {
   localStorage.setItem('realMealPlan_lastSavedWeekStart', formatDateForStorage(date));

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Real Meal Plan | Meal History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+<nav class="main-nav">
+  <a href="index.html" class="nav-link">Weekly Randomizer</a>
+  <a href="calendar.html" class="nav-link">Calendar Planner</a>
+  <a href="budget.html" class="nav-link">Budget Tracker</a>
+  <a href="history.html" class="nav-link active">Meal History</a>
+  <a href="vault.html" class="nav-link">Recipe Vault</a>
+</nav>
+
+  <div class="title-card">
+    <h1>Meal History</h1>
+    <p class="tagline">Review any week & check off completed meals</p>
+  </div>
+
+  <!-- Week selector -->
+  <div class="week-selector-row">
+    <button class="btn btn-secondary btn-small" id="prevWeekBtn">←</button>
+    <span id="weekRangeLabel"></span>
+    <button class="btn btn-secondary btn-small" id="nextWeekBtn">→</button>
+    <button class="btn btn-secondary btn-small" id="thisWeekBtn">This Week</button>
+  </div>
+
+  <!-- Mini calendar grid for the selected week -->
+  <div class="mini-calendar-grid" id="miniCalendarGrid">
+    <!-- Days injected by JS -->
+  </div>
+
+  <!-- Completed Meals History Log -->
+  <div class="budget-section">
+    <h2>Completed Meals</h2>
+    <button class="btn btn-secondary btn-small" id="clearHistoryBtn" style="margin-bottom:1rem;">Clear All History</button>
+    <div class="table-wrapper">
+      <table class="week-table" id="historyTable">
+        <thead>
+          <tr><th>Date Completed</th><th>Day</th><th>Main</th><th>Side</th><th>Vegetable</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="historyTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <footer>All data saved locally in your browser.</footer>
+</div>
+
+<script src="history.js"></script>
+</body>
+</html>

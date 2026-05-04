@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>Real Meal Plan | Recipe Vault</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="container">
+  <nav class="main-nav">
+  <a href="index.html" class="nav-link">Weekly Randomizer</a>
+  <a href="calendar.html" class="nav-link">Calendar Planner</a>
+  <a href="budget.html" class="nav-link">Budget Tracker</a>
+  <a href="history.html" class="nav-link">Meal History</a>
+  <a href="vault.html" class="nav-link active">Recipe Vault</a>
+</nav>
+
+  <div class="title-card">
+    <h1>Recipe Vault</h1>
+    <p class="tagline">Browse all available dishes and their recipes</p>
+  </div>
+
+  <!-- Filter by category buttons -->
+  <div class="vault-filters">
+    <button class="btn btn-secondary btn-small vault-filter-btn active" data-cat="all">All</button>
+    <button class="btn btn-secondary btn-small vault-filter-btn" data-cat="Main Dish">🍖 Mains</button>
+    <button class="btn btn-secondary btn-small vault-filter-btn" data-cat="Side">🍚 Sides</button>
+    <button class="btn btn-secondary btn-small vault-filter-btn" data-cat="Vegetable">🥬 Vegetables</button>
+  </div>
+
+  <!-- Dish list -->
+  <div class="vault-grid" id="vaultGrid">
+    <!-- dynamically filled -->
+  </div>
+
+  <!-- Recipe detail panel (same style as recipe panel) -->
+  <div class="recipe-panel" id="recipePanel">
+    <div class="recipe-header">
+      <h3 id="recipeTitle">Recipe</h3>
+      <button class="recipe-close-btn" id="closeRecipeBtn">&times;</button>
+    </div>
+    <div class="recipe-content" id="recipeContent">
+      Click a dish to view its full recipe.
+    </div>
+  </div>
+
+  <footer>All placeholder recipes — replace with real ones in vault.js</footer>
+</div>
+
+<script src="vault.js"></script>
+</body>
+</html>
