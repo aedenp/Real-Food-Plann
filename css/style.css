@@ -1409,4 +1409,64 @@ footer {
   font-size: 0.85rem;
   margin-top: 0.3rem;
   display: none;
+}/* =================================================================
+   MOBILE FIXES – NAVIGATION & CALENDAR
+   ================================================================= */
+
+/* ---- NAV (prevents text from leaving the pill buttons) ---- */
+@media (max-width: 680px) {
+  .main-nav {
+    background: rgba(255, 255, 245, 0.95); /* match page container */
+    border-radius: 60px;
+    padding: 0.5rem;
+    flex-wrap: wrap;          /* already present, but confirm */
+    justify-content: center;
+    gap: 0.4rem;
+  }
+
+  .nav-link {
+    padding: 0.55rem 1.1rem;  /* slightly bigger touch target */
+    font-size: 0.8rem;
+    white-space: nowrap;       /* keep text in one line */
+    border: 1px solid #cde2c4; /* subtle border when not active */
+    background: #f4faf1;       /* soft background so the pill is visible */
+    margin: 0.2rem 0;
+  }
+
+  .nav-link.active {
+    background: #4c8c4a;
+    border-color: #3c723a;
+    color: white;
+  }
+}
+
+/* ---- CALENDAR (compact grid & readability on mobile) ---- */
+@media (max-width: 680px) {
+  .calendar-wrapper {
+    padding: 0.5rem;             /* reduce padding so grid fills more width */
+  }
+
+  .calendar-header {
+    font-size: 0.7rem;           /* smaller day labels (Sun, Mon, etc.) */
+  }
+
+  .calendar-day {
+    min-height: 65px;            /* slightly shorter cells */
+    padding: 0.25rem;
+    font-size: 0.7rem;
+    border-radius: 8px;
+  }
+
+  .day-number {
+    font-size: 0.75rem;
+  }
+
+  .day-meal-preview {
+    font-size: 0.55rem;          /* tiny text for meal previews */
+  }
+}
+
+/* ---- Ensure the full calendar doesn't overflow ---- */
+.calendar-wrapper {
+  overflow-x: auto;              /* only if grid still breaks, add horizontal scroll */
 }
