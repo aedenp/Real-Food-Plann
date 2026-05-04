@@ -1470,3 +1470,72 @@ footer {
 .calendar-wrapper {
   overflow-x: auto;              /* only if grid still breaks, add horizontal scroll */
 }
+
+/* Portrait phone – extra compact nav & calendar */
+@media (max-width: 500px) {
+  /* NAV */
+  .main-nav {
+    gap: 0.3rem;
+    padding: 0.3rem;
+    border-radius: 40px;
+    background: rgba(255, 255, 245, 0.6); /* subtle background to hold pills */
+  }
+
+  .nav-link {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.7rem;
+    border-radius: 40px;
+    border: 1px solid #cde2c4;
+    background: #f4faf1;
+  }
+
+  .nav-link.active {
+    background: #4c8c4a;
+    border-color: #3c723a;
+    color: white;
+  }
+
+  /* CALENDAR */
+  .calendar-wrapper {
+    padding: 0.2rem;
+  }
+
+  .calendar-header {
+    font-size: 0.65rem;
+    gap: 0.1rem;
+  }
+
+  .calendar-grid {
+    gap: 0.15rem;
+  }
+
+  .calendar-day {
+    aspect-ratio: 1 / 1.2;
+    min-height: 55px;
+    padding: 0.15rem;
+    border-radius: 6px;
+  }
+
+  .day-number {
+    font-size: 0.65rem;
+    margin-bottom: 0;
+  }
+
+  .day-meal-preview {
+    font-size: 0.45rem;
+    -webkit-line-clamp: 2;      /* show max 2 lines of meal text */
+  }
+
+  .day-meal-preview span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+  }
+
+  /* adjust day detail panel if needed */
+  .day-detail-content,
+  .meal-form {
+    padding: 0.8rem;
+  }
+}
