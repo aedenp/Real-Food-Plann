@@ -41,6 +41,7 @@ const receiptTotal = document.getElementById('receiptTotal');
 const saveReceiptBtn = document.getElementById('saveReceiptBtn');
 const weekAvgOverallEl = document.getElementById('weekAvgOverall');
 const monthAvgOverallEl = document.getElementById('monthAvgOverall');
+const annualTotalEl = document.getElementById('annualTotal');  // new
 const weekFilter = document.getElementById('weekFilter');
 const expenseTableBody = document.getElementById('expenseTableBody');
 const monthlyTotalsBody = document.getElementById('monthlyTotalsBody');
@@ -59,7 +60,7 @@ function getMonday(date) {
   const day = d.getDay();
   const diff = day === 0 ? 6 : day - 1;
   d.setDate(d.getDate() - diff);
-  d.setHours(0, 0, 0, 0);
+  d.setHours(0,0,0,0);
   return d;
 }
 
@@ -72,8 +73,8 @@ function formatWeekRange(monday) {
 
 function formatDate(date) {
   const y = date.getFullYear();
-  const m = String(date.getMonth() + 1).padStart(2, '0');
-  const d = String(date.getDate()).padStart(2, '0');
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
   return `${y}-${m}-${d}`;
 }
 
@@ -89,7 +90,7 @@ function renderDayStrip() {
 
   let html = '';
   days.forEach(d => {
-    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' });
+    const dayName = d.toLocaleDateString('en-US', { weekday:'short' });
     const dayNum = d.getDate();
     const dateStr = formatDate(d);
     const isToday = d.toDateString() === today.toDateString();
@@ -118,17 +119,23 @@ prevWeekBtn.addEventListener('click', () => {
   displayedWeekStart.setDate(displayedWeekStart.getDate() - 7);
   renderDayStrip();
   const sel = new Date(receiptDateHidden.value + 'T12:00:00');
+<<<<<<< HEAD:js/budget.js
   if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7 * 86400000)) {
+=======
+  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7*86400000))
+>>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
     receiptDateHidden.value = formatDate(displayedWeekStart);
-  }
 });
 nextWeekBtn.addEventListener('click', () => {
   displayedWeekStart.setDate(displayedWeekStart.getDate() + 7);
   renderDayStrip();
   const sel = new Date(receiptDateHidden.value + 'T12:00:00');
+<<<<<<< HEAD:js/budget.js
   if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7 * 86400000)) {
+=======
+  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7*86400000))
+>>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
     receiptDateHidden.value = formatDate(displayedWeekStart);
-  }
 });
 thisWeekBtn.addEventListener('click', () => {
   displayedWeekStart = getMonday(new Date());
@@ -152,17 +159,15 @@ function updateTotalFromBreakdown() {
   receiptTotal.value = total.toFixed(2);
 }
 
-// ---------- SAVE RECEIPT ----------
+// ---------- SAVE & DELETE ----------
 saveReceiptBtn.addEventListener('click', () => {
   const date = receiptDateHidden.value;
   const desc = receiptDesc.value.trim();
   const total = parseFloat(receiptTotal.value);
-
   if (!date || isNaN(total) || total <= 0) {
     alert('Please enter a valid total amount.');
     return;
   }
-
   let breakdown = null;
   if (enableBreakdown.checked) {
     breakdown = {};
@@ -175,7 +180,6 @@ saveReceiptBtn.addEventListener('click', () => {
     });
     receiptTotal.value = sum.toFixed(2);
   }
-
   expenses.push({
     id: Date.now(),
     date,
@@ -183,7 +187,6 @@ saveReceiptBtn.addEventListener('click', () => {
     total: parseFloat(receiptTotal.value),
     breakdown
   });
-
   saveExpenses();
   clearForm();
   refreshAll();
@@ -215,10 +218,13 @@ function getWeekExpenses(monday) {
   });
 }
 
-// ---------- AVERAGES ----------
+// ---------- AVERAGES & ANNUAL TOTAL ----------
 function updateAverages() {
+<<<<<<< HEAD:js/budget.js
   const total = expenses.reduce((sum, exp) => sum + exp.total, 0);
 
+=======
+>>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
   const weekSet = new Set();
   expenses.forEach(exp => {
     const monday = getMonday(new Date(exp.date + 'T12:00:00'));
@@ -230,13 +236,20 @@ function updateAverages() {
   const monthSet = new Set();
   expenses.forEach(exp => {
     const d = new Date(exp.date + 'T12:00:00');
-    monthSet.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+    monthSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
   });
   const monthCount = monthSet.size || 1;
   monthAvgOverallEl.textContent = `$${(total / monthCount).toFixed(2)}`;
+
+  // Annual total (current year)
+  const currentYear = new Date().getFullYear();
+  const annualTotal = expenses
+    .filter(exp => new Date(exp.date + 'T12:00:00').getFullYear() === currentYear)
+    .reduce((sum, exp) => sum + exp.total, 0);
+  annualTotalEl.textContent = `$${annualTotal.toFixed(2)}`;
 }
 
-// ---------- WEEK FILTER & TABLE ----------
+// ---------- WEEK FILTER & TABLES ----------
 function populateWeekFilter() {
   const weekSet = new Set();
   expenses.forEach(exp => {
@@ -267,16 +280,18 @@ function renderExpenseTable() {
       <td>${breakdownStr}</td><td><button class="clear-day-btn" onclick="deleteExpense(${exp.id})">Delete</button></td>
     </tr>`;
   }).join('');
+<<<<<<< HEAD:js/budget.js
 
+=======
+>>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
   renderMonthlyTotalsTable();
 }
 
-// ---------- MONTHLY TOTALS TABLE ----------
 function renderMonthlyTotalsTable() {
   const totals = {};
   expenses.forEach(exp => {
     const d = new Date(exp.date + 'T12:00:00');
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     totals[key] = (totals[key] || 0) + exp.total;
   });
   const sorted = Object.keys(totals).sort().reverse();
@@ -285,7 +300,7 @@ function renderMonthlyTotalsTable() {
   ).join('');
 }
 
-// ---------- CHARTS (wait for Chart.js) ----------
+// ---------- CHARTS ----------
 function ensureCharts() {
   if (typeof Chart === 'undefined') {
     setTimeout(ensureCharts, 100);
@@ -297,10 +312,15 @@ function ensureCharts() {
 
 function updateWeeklyChart() {
   const currentMonday = getMonday(new Date());
-  const labels = [], barData = [], lineData = [];
+  let latestMonday = currentMonday;
+  expenses.forEach(exp => {
+    const expMonday = getMonday(new Date(exp.date + 'T12:00:00'));
+    if (expMonday > latestMonday) latestMonday = expMonday;
+  });
 
+  const labels = [], barData = [], lineData = [];
   for (let i = 11; i >= 0; i--) {
-    const monday = new Date(currentMonday);
+    const monday = new Date(latestMonday);
     monday.setDate(monday.getDate() - i * 7);
     const total = getWeekExpenses(monday).reduce((sum, exp) => sum + exp.total, 0);
     labels.push(formatWeekRange(monday).substring(0, 6));
@@ -343,19 +363,31 @@ function updateWeeklyChart() {
 }
 
 function updateMonthlyChart() {
+  const now = new Date();
+  let latestYear = now.getFullYear();
+  let latestMonth = now.getMonth();
+  expenses.forEach(exp => {
+    const d = new Date(exp.date + 'T12:00:00');
+    const y = d.getFullYear();
+    const m = d.getMonth();
+    if (y > latestYear || (y === latestYear && m > latestMonth)) {
+      latestYear = y;
+      latestMonth = m;
+    }
+  });
+
   const totalsMap = {};
   expenses.forEach(exp => {
     const d = new Date(exp.date + 'T12:00:00');
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     totalsMap[key] = (totalsMap[key] || 0) + exp.total;
   });
 
-  const now = new Date();
   const labels = [], barData = [], lineData = [];
   for (let i = 11; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    labels.push(d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+    const d = new Date(latestYear, latestMonth - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    labels.push(d.toLocaleDateString('en-US', { month:'short', year:'2-digit' }));
     const total = totalsMap[key] || 0;
     barData.push(total);
     lineData.push(total);
@@ -411,6 +443,7 @@ deleteAllBtn.addEventListener('click', () => {
   }
 });
 
+<<<<<<< HEAD:js/budget.js
 // --------------------------------------------------------------
 // AUTH HOOK
 // --------------------------------------------------------------
@@ -419,3 +452,6 @@ function onUserReady(userId) {
     refreshAll();
   });
 }
+=======
+refreshAll();
+>>>>>>> 7aed749546d9dc01a39353a6b3e2ff421f58d605:budget.js
