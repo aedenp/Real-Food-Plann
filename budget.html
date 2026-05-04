@@ -7,28 +7,29 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
 <div class="container">
-<nav class="main-nav">
-  <a href="index.html" class="nav-link">Weekly Randomizer</a>
-  <a href="calendar.html" class="nav-link">Calendar Planner</a>
-  <a href="budget.html" class="nav-link active">Budget Tracker</a>
-  <a href="history.html" class="nav-link">Meal History</a>
-  <a href="vault.html" class="nav-link">Recipe Vault</a>
-</nav>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-link">Weekly Randomizer</a>
+    <a href="calendar.html" class="nav-link">Calendar Planner</a>
+    <a href="budget.html" class="nav-link active">Budget Tracker</a>
+    <a href="history.html" class="nav-link">Meal History</a>
+    <a href="vault.html" class="nav-link">Recipe Vault</a>
+    <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+  </nav>
 
   <div class="title-card">
     <div class="logo-area">
-      <img src="your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
+      <img src="images/your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
       <h1>Budget Tracker</h1>
     </div>
     <p class="tagline">Track your grocery spending over time</p>
   </div>
 
-  <!-- Receipt Input with day picker -->
+  <!-- Receipt Input Section -->
   <div class="budget-section">
     <h2>Add Receipt</h2>
     <div class="receipt-form" id="receiptForm">
@@ -90,7 +91,7 @@
     </div>
   </div>
 
-  <!-- Expense Table with week filter -->
+  <!-- Expense Table -->
   <div class="budget-section">
     <h2>Expenses</h2>
     <div class="filter-row">
@@ -123,6 +124,12 @@
   <footer>All data saved locally in your browser.</footer>
 </div>
 
-<script src="budget.js"></script>
+<!-- Firebase SDKs + auth + helpers -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/budget.js"></script>
 </body>
 </html>

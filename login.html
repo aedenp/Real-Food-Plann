@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Real Meal Plan | Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="login-container">
+    <!-- Branding -->
+    <div class="login-brand">
+      <h1>Real Meal Plan</h1>
+      <p>Your weekly dinner, beautifully organized</p>
+    </div>
+
+    <!-- Card -->
+    <div class="login-card">
+      <!-- Tabs -->
+      <div class="login-tabs">
+        <button class="login-tab active" id="signInTab">Sign In</button>
+        <button class="login-tab" id="signUpTab">Sign Up</button>
+      </div>
+
+      <!-- Form -->
+      <form id="authForm" class="login-form">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="••••••••" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary" id="submitBtn">Sign In</button>
+        <p class="login-error" id="errorMsg"></p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    const signInTab = document.getElementById('signInTab');
+    const signUpTab = document.getElementById('signUpTab');
+    const formTitle = document.getElementById('formTitle');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorMsg = document.getElementById('errorMsg');
+
+    let isSignUp = false;
+
+    signInTab.addEventListener('click', () => {
+      isSignUp = false;
+      signInTab.classList.add('active');
+      signUpTab.classList.remove('active');
+      submitBtn.textContent = 'Sign In';
+    });
+
+    signUpTab.addEventListener('click', () => {
+      isSignUp = true;
+      signUpTab.classList.add('active');
+      signInTab.classList.remove('active');
+      submitBtn.textContent = 'Sign Up';
+    });
+
+    document.getElementById('authForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      errorMsg.style.display = 'none';
+
+      const authFunction = isSignUp ? signUp(email, password) : signIn(email, password);
+      authFunction
+        .then(() => { window.location.href = 'index.html'; })
+        .catch(error => {
+          errorMsg.textContent = error.message;
+          errorMsg.style.display = 'block';
+        });
+    });
+  </script>
+</body>
+</html>

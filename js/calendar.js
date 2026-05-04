@@ -1,7 +1,6 @@
 // --------------------------------------------------------------
 // SHARED MEAL DATABASES
 // --------------------------------------------------------------
-
 const MAIN_DISHES = [
   { name: "Lemon Herb Chicken", meats: ["chicken"] },
   { name: "Chicken Stir Fry", meats: ["chicken"] },
@@ -22,7 +21,6 @@ const MAIN_DISHES = [
   { name: "Jambalaya (Chicken & Shrimp)", meats: ["chicken", "fish"] },
   { name: "Pork & Shrimp Dumplings", meats: ["pork", "fish"] }
 ];
-
 const SIDES = [
   "Steamed Jasmine Rice",
   "Garlic Mashed Potatoes",
@@ -35,7 +33,6 @@ const SIDES = [
   "Cilantro Lime Rice",
   "Crusty Baguette"
 ];
-
 const VEGETABLES = [
   { name: "Sautéed Bell Peppers & Onions", vegTypes: ["peppers"] },
   { name: "Roasted Broccoli with Garlic", vegTypes: ["broccoli"] },
@@ -278,19 +275,9 @@ addRecipes(MAIN_DISHES, 'Main Dish', mainIngredients);
 addRecipes(SIDES, 'Side', sideIngredients);
 addRecipes(VEGETABLES, 'Vegetable', vegIngredients);
 
-function getRecipeText(dishName) {
-  const recipe = RECIPES[dishName];
-  if (!recipe) return `Recipe for "${dishName}" is not yet available.`;
-  let text = `📋 **${dishName}** (${recipe.category})\n\n**Ingredients:**\n`;
-  recipe.ingredients.forEach(ing => text += `- ${ing.quantity} ${ing.name}\n`);
-  text += `\n**Instructions:**\n${recipe.instructions}`;
-  return text;
-}
-
 // --------------------------------------------------------------
 // GROCERY LIST CATEGORIZATION & PARSING
 // --------------------------------------------------------------
-
 const CATEGORY_KEYWORDS = {
   'Meat & Seafood': ['chicken', 'beef', 'pork', 'salmon', 'shrimp', 'cod', 'sausage', 'tenderloin', 'steak', 'ground', 'thighs', 'breast', 'pepperoni', 'dumpling', 'andouille'],
   'Produce': ['onion', 'garlic', 'lemon', 'herbs', 'rosemary', 'thyme', 'bell pepper', 'carrot', 'broccoli', 'cauliflower', 'string bean', 'parsnip', 'ginger', 'cilantro', 'lime', 'corn', 'mixed greens', 'tomato', 'cucumber', 'dill', 'potato', 'sweet potato'],
@@ -334,7 +321,6 @@ function formatQuantity(value, unit) {
 // --------------------------------------------------------------
 // CALENDAR STATE
 // --------------------------------------------------------------
-
 let currentDate = new Date();
 let selectedDate = null;
 let mealPlans = {}; // key: "YYYY-MM-DD"
@@ -344,17 +330,35 @@ let selectedDates = new Set();
 // Grocery state
 let currentGroceryItems = [];
 
-// Load / save
-function loadMealPlans() {
-  const saved = localStorage.getItem('realMealPlan_calendar');
-  if (saved) {
-    try { mealPlans = JSON.parse(saved); } catch(e) { mealPlans = {}; }
+// Firestore functions (replace localStorage)
+function saveMealPlans() {
+  if (currentUser) {
+    db.collection('users').doc(currentUser.uid).collection('data').doc('calendar')
+      .set({ mealPlans })
+      .catch(err => console.error('Save calendar failed:', err));
   }
 }
-function saveMealPlans() {
-  localStorage.setItem('realMealPlan_calendar', JSON.stringify(mealPlans));
+
+function loadMealPlans(callback) {
+  if (!currentUser) {
+    callback();
+    return;
+  }
+  db.collection('users').doc(currentUser.uid).collection('data').doc('calendar')
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        mealPlans = doc.data().mealPlans || {};
+      } else {
+        mealPlans = {};
+      }
+      callback();
+    })
+    .catch(() => {
+      mealPlans = {};
+      callback();
+    });
 }
-loadMealPlans();
 
 // DOM Elements
 const calendarGrid = document.getElementById('calendarGrid');
@@ -395,7 +399,7 @@ groceryToggleBtn.addEventListener('click', () => {
 });
 
 // --------------------------------------------------------------
-// DROPDOWNS & RECIPE
+// DROPDOWNS
 // --------------------------------------------------------------
 
 function populateDropdowns() {
@@ -408,12 +412,22 @@ function populateDropdowns() {
 }
 populateDropdowns();
 
+// Recipe
 function showRecipe(dishName) {
   recipeTitle.textContent = dishName;
   recipeContent.textContent = getRecipeText(dishName);
   recipePanel.classList.add('show');
 }
 closeRecipeBtn.addEventListener('click', () => recipePanel.classList.remove('show'));
+
+function getRecipeText(dishName) {
+  const recipe = RECIPES[dishName];
+  if (!recipe) return `Recipe for "${dishName}" is not yet available.`;
+  let text = `📋 **${dishName}** (${recipe.category})\n\n**Ingredients:**\n`;
+  recipe.ingredients.forEach(ing => text += `- ${ing.quantity} ${ing.name}\n`);
+  text += `\n**Instructions:**\n${recipe.instructions}`;
+  return text;
+}
 
 // --------------------------------------------------------------
 // CALENDAR RENDERING
@@ -579,7 +593,7 @@ fillWeekBtn.addEventListener('click', () => {
 });
 
 // --------------------------------------------------------------
-// SELECTION MODE & MANAGEMENT
+// SELECT MODE & MANAGEMENT
 // --------------------------------------------------------------
 
 function setSelectMode(enabled) {
@@ -782,7 +796,7 @@ groceryForWeekBtn.addEventListener('click', generateGroceryListFromSelected);
 clearGroceryBtn.addEventListener('click', clearGroceryList);
 
 // --------------------------------------------------------------
-// NAVIGATION & INIT
+// NAVIGATION
 // --------------------------------------------------------------
 
 prevMonthBtn.addEventListener('click', () => {
@@ -798,6 +812,14 @@ todayBtn.addEventListener('click', () => {
   renderCalendar();
 });
 
-document.getElementById('logoImage').onerror = function() { this.style.display = 'none'; };
+// --------------------------------------------------------------
+// AUTH HOOK
+// --------------------------------------------------------------
+function onUserReady(userId) {
+  loadMealPlans(() => {
+    renderCalendar();
+  });
+}
 
-renderCalendar();
+// Logo fallback
+document.getElementById('logoImage').onerror = function() { this.style.display = 'none'; };

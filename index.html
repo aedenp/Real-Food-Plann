@@ -7,26 +7,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="container">
-<nav class="main-nav">
-  <a href="index.html" class="nav-link active">Weekly Randomizer</a>
-  <a href="calendar.html" class="nav-link">Calendar Planner</a>
-  <a href="budget.html" class="nav-link">Budget Tracker</a>
-  <a href="history.html" class="nav-link">Meal History</a>
-  <a href="vault.html" class="nav-link">Recipe Vault</a>
-</nav>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-link active">Weekly Randomizer</a>
+    <a href="calendar.html" class="nav-link">Calendar Planner</a>
+    <a href="budget.html" class="nav-link">Budget Tracker</a>
+    <a href="history.html" class="nav-link">Meal History</a>
+    <a href="vault.html" class="nav-link">Recipe Vault</a>
+    <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+  </nav>
 
   <div class="title-card">
     <div class="logo-area">
-      <img src="your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
+      <img src="images/your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
       <h1>Real Meal Plan</h1>
     </div>
     <p class="tagline">Build your weekly dinner menu — one complete meal at a time</p>
   </div>
 
+  <!-- Collapsible Filters Section -->
   <div class="filters-collapsible">
     <button class="filter-toggle-btn" id="filterToggleBtn">
       <span class="toggle-icon">▼</span> Select your filters
@@ -42,7 +44,7 @@
           <label><input type="checkbox" value="pork" id="filterPork"> Pork</label>
           <label><input type="checkbox" value="fish" id="filterFish"> Fish / Seafood</label>
         </div>
-        <div class="filter-note">If no protein selected → only meat‑based mains (no vegetarian). Select one or more to require those proteins.</div>
+        <div class="filter-note">If no protein selected → only meat-based mains (no vegetarian). Select one or more to require those proteins.</div>
       </div>
 
       <div class="filter-divider"></div>
@@ -62,6 +64,7 @@
     </div>
   </div>
 
+  <!-- Control bar -->
   <div class="action-bar">
     <div class="btn-group">
       <button class="btn btn-primary" id="generateBtn">Generate & fill next day</button>
@@ -70,6 +73,7 @@
     <div class="feedback" id="feedbackMsg">Click generate — fills Monday → Sunday</div>
   </div>
 
+  <!-- Weekly table with blocker columns -->
   <div class="table-wrapper">
     <table class="week-table" id="weeklyTable">
       <thead>
@@ -118,11 +122,14 @@
       </div>
     </div>
   </div>
-
-
-  
 </div>
 
-<script src="script.js"></script>
+<!-- Firebase SDKs + auth + helpers -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>

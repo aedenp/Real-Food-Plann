@@ -7,17 +7,18 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="container">
-<nav class="main-nav">
-  <a href="index.html" class="nav-link">Weekly Randomizer</a>
-  <a href="calendar.html" class="nav-link">Calendar Planner</a>
-  <a href="budget.html" class="nav-link">Budget Tracker</a>
-  <a href="history.html" class="nav-link active">Meal History</a>
-  <a href="vault.html" class="nav-link">Recipe Vault</a>
-</nav>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-link">Weekly Randomizer</a>
+    <a href="calendar.html" class="nav-link">Calendar Planner</a>
+    <a href="budget.html" class="nav-link">Budget Tracker</a>
+    <a href="history.html" class="nav-link active">Meal History</a>
+    <a href="vault.html" class="nav-link">Recipe Vault</a>
+    <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+  </nav>
 
   <div class="title-card">
     <h1>Meal History</h1>
@@ -32,12 +33,10 @@
     <button class="btn btn-secondary btn-small" id="thisWeekBtn">This Week</button>
   </div>
 
-  <!-- Mini calendar grid for the selected week -->
-  <div class="mini-calendar-grid" id="miniCalendarGrid">
-    <!-- Days injected by JS -->
-  </div>
+  <!-- Mini calendar grid -->
+  <div class="mini-calendar-grid" id="miniCalendarGrid"></div>
 
-  <!-- Completed Meals History Log -->
+  <!-- Completed Meals Log -->
   <div class="budget-section">
     <h2>Completed Meals</h2>
     <button class="btn btn-secondary btn-small" id="clearHistoryBtn" style="margin-bottom:1rem;">Clear All History</button>
@@ -51,9 +50,15 @@
     </div>
   </div>
 
-  <footer>All data saved locally in your browser.</footer>
+  <footer>All data saved in your account.</footer>
 </div>
 
-<script src="history.js"></script>
+<!-- Firebase SDKs + auth + helpers -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/history.js"></script>
 </body>
 </html>

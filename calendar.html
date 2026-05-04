@@ -7,25 +7,28 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="container">
-<nav class="main-nav">
-  <a href="index.html" class="nav-link">Weekly Randomizer</a>
-  <a href="calendar.html" class="nav-link active">Calendar Planner</a>
-  <a href="budget.html" class="nav-link">Budget Tracker</a>
-  <a href="history.html" class="nav-link">Meal History</a>
-  <a href="vault.html" class="nav-link">Recipe Vault</a>
-</nav>
+  <nav class="main-nav">
+    <a href="index.html" class="nav-link">Weekly Randomizer</a>
+    <a href="calendar.html" class="nav-link active">Calendar Planner</a>
+    <a href="budget.html" class="nav-link">Budget Tracker</a>
+    <a href="history.html" class="nav-link">Meal History</a>
+    <a href="vault.html" class="nav-link">Recipe Vault</a>
+    <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+  </nav>
+
   <div class="title-card">
     <div class="logo-area">
-      <img src="your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
+      <img src="images/your-logo.png" alt="Real Meal Plan Logo" class="logo" id="logoImage" onerror="this.style.display='none'">
       <h1>Meal Calendar</h1>
     </div>
     <p class="tagline">Plan your dinners for any date — past, present, or future</p>
   </div>
 
+  <!-- Calendar Controls -->
   <div class="calendar-controls">
     <div class="month-nav">
       <button class="btn btn-secondary btn-small" id="prevMonthBtn">← Prev</button>
@@ -46,6 +49,7 @@
     <button class="btn-text" id="clearSelectionBtn">Clear selection</button>
   </div>
 
+  <!-- Calendar Grid -->
   <div class="calendar-wrapper">
     <div class="calendar-header">
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
@@ -53,6 +57,7 @@
     <div class="calendar-grid" id="calendarGrid"></div>
   </div>
 
+  <!-- Day Detail Panel -->
   <div class="day-detail-panel" id="dayDetailPanel">
     <div class="day-detail-header">
       <h3 id="selectedDateDisplay">Select a date</h3>
@@ -78,6 +83,7 @@
     </div>
   </div>
 
+  <!-- Recipe Panel -->
   <div class="recipe-panel" id="recipePanel">
     <div class="recipe-header">
       <h3 id="recipeTitle">Recipe</h3>
@@ -86,6 +92,7 @@
     <div class="recipe-content" id="recipeContent">Select a dish above to view its recipe.</div>
   </div>
 
+  <!-- Grocery List Section -->
   <div class="grocery-section">
     <button class="grocery-toggle-btn" id="groceryToggleBtn">
       <span class="toggle-icon">🛒</span> Grocery List <span id="groceryItemCount" class="grocery-count">0</span>
@@ -104,13 +111,14 @@
   </div>
 
   <footer>Click any date to view or edit dinner plans. Changes are saved automatically in your browser.</footer>
-
-
-
 </div>
 
-
-
-<script src="calendar.js"></script>
+<!-- Firebase SDKs + auth + helpers -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/auth.js"></script>
+<script src="js/calendar.js"></script>
 </body>
 </html>

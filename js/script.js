@@ -288,9 +288,8 @@ function getRecipeText(dishName) {
 }
 
 // --------------------------------------------------------------
-// GROCERY LIST CATEGORIZATION & QUANTITY PARSING
+// GROCERY LIST CATEGORIZATION & PARSING
 // --------------------------------------------------------------
-
 const CATEGORY_KEYWORDS = {
   'Meat & Seafood': ['chicken', 'beef', 'pork', 'salmon', 'shrimp', 'cod', 'sausage', 'tenderloin', 'steak', 'ground', 'thighs', 'breast', 'pepperoni', 'dumpling', 'andouille'],
   'Produce': ['onion', 'garlic', 'lemon', 'herbs', 'rosemary', 'thyme', 'bell pepper', 'carrot', 'broccoli', 'cauliflower', 'string bean', 'parsnip', 'ginger', 'cilantro', 'lime', 'corn', 'mixed greens', 'tomato', 'cucumber', 'dill', 'potato', 'sweet potato'],
@@ -334,7 +333,6 @@ function formatQuantity(value, unit) {
 // --------------------------------------------------------------
 // WEEKLY PLAN & STATE
 // --------------------------------------------------------------
-
 const WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TOTAL_DAYS = 7;
 
@@ -645,7 +643,7 @@ function clearSpecificDay(index) {
     blockerCheckboxes[index].veg.checked = false;
     updateNextFillIndex();
     syncTableFromPlan();
-    saveCurrentWeekToStorage(); // <-- AUTO SAVE
+    saveWeeklyPlanToFirestore();
     feedbackDiv.innerHTML = `${WEEKDAYS[index]} cleared. Next fill will be ${WEEKDAYS[nextFillIndex]}.`;
     feedbackDiv.style.background = "#eef4eb";
     feedbackDiv.style.color = "#2b6e3c";
@@ -692,12 +690,15 @@ function setCell(cell, text, category) {
   }
 }
 
-function resetWeeklyPlan() {
+function resetWeeklyPlanLocal() {
   weeklyPlan = new Array(TOTAL_DAYS).fill(null);
   nextFillIndex = 0;
-  blockerCheckboxes.forEach(cb => { cb.main.checked = false; cb.side.checked = false; cb.veg.checked = false; });
+}
+
+function resetWeeklyPlan() {
+  resetWeeklyPlanLocal();
   syncTableFromPlan();
-  saveCurrentWeekToStorage(); // <-- AUTO SAVE
+  saveWeeklyPlanToFirestore();
   feedbackDiv.innerHTML = "Weekly plan cleared. Use 'Generate' to start filling from Monday.";
   feedbackDiv.style.background = "#eef4eb";
   feedbackDiv.style.color = "#2b6e3c";
@@ -713,6 +714,8 @@ function generateAndFillNextDay() {
 
   const idx = nextFillIndex;
   const blockers = blockerCheckboxes[idx];
+  if (!blockers) return false;
+
   const blockMain = blockers.main.checked;
   const blockSide = blockers.side.checked;
   const blockVeg = blockers.veg.checked;
@@ -751,7 +754,7 @@ function generateAndFillNextDay() {
   const currentDay = WEEKDAYS[idx];
   updateNextFillIndex();
   syncTableFromPlan();
-  saveCurrentWeekToStorage(); // <-- AUTO SAVE
+  saveWeeklyPlanToFirestore();
 
   const remaining = TOTAL_DAYS - nextFillIndex;
   if (remaining === 0) {
@@ -767,32 +770,68 @@ function generateAndFillNextDay() {
 }
 
 // --------------------------------------------------------------
-// SAVE CURRENT WEEK TO LOCAL STORAGE (for History page)
+// FIREBASE DATA FUNCTIONS
 // --------------------------------------------------------------
-function saveCurrentWeekToStorage() {
-  localStorage.setItem('realMealPlan_currentWeek', JSON.stringify(weeklyPlan));
+function saveWeeklyPlanToFirestore() {
+  if (!currentUser) return;
+  db.collection('users').doc(currentUser.uid).collection('data').doc('weeklyPlan')
+    .set({ weeklyPlan, nextFillIndex })
+    .catch(err => console.error('Save weeklyPlan failed:', err));
+}
+
+function loadWeeklyPlanFromFirestore(callback) {
+  if (!currentUser) { callback(); return; }
+  db.collection('users').doc(currentUser.uid).collection('data').doc('weeklyPlan')
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        const data = doc.data();
+        weeklyPlan = data.weeklyPlan || new Array(TOTAL_DAYS).fill(null);
+        nextFillIndex = data.nextFillIndex || 0;
+      } else {
+        resetWeeklyPlanLocal();
+      }
+      callback();
+    })
+    .catch(() => {
+      resetWeeklyPlanLocal();
+      callback();
+    });
 }
 
 // --------------------------------------------------------------
-// SAVE WEEK TO CALENDAR (existing)
+// SAVE WEEK TO CALENDAR (Firestore version)
 // --------------------------------------------------------------
 const saveWeekToCalendarBtn = document.getElementById('saveWeekToCalendarBtn');
 const saveCalendarNote = document.getElementById('saveCalendarNote');
 
 function formatDateForStorage(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
 }
 
-function getLastSavedWeekStart() {
-  const saved = localStorage.getItem('realMealPlan_lastSavedWeekStart');
-  if (saved) return new Date(saved + 'T12:00:00');
-  return null;
+// Last saved week start: store in Firestore user preferences
+function getLastSavedWeekStart(callback) {
+  if (!currentUser) { callback(null); return; }
+  db.collection('users').doc(currentUser.uid).collection('data').doc('preferences')
+    .get()
+    .then(doc => {
+      if (doc.exists && doc.data().lastSavedWeekStart) {
+        callback(new Date(doc.data().lastSavedWeekStart + 'T12:00:00'));
+      } else {
+        callback(null);
+      }
+    })
+    .catch(() => callback(null));
 }
+
 function setLastSavedWeekStart(date) {
-  localStorage.setItem('realMealPlan_lastSavedWeekStart', formatDateForStorage(date));
+  if (!currentUser) return;
+  db.collection('users').doc(currentUser.uid).collection('data').doc('preferences')
+    .set({ lastSavedWeekStart: formatDateForStorage(date) }, { merge: true })
+    .catch(err => console.error('Save lastWeekStart failed:', err));
 }
 
 function getNextMondayAfter(date) {
@@ -801,65 +840,87 @@ function getNextMondayAfter(date) {
   return next;
 }
 
-function getSuggestedStartDate() {
-  const last = getLastSavedWeekStart();
-  return last ? getNextMondayAfter(last) : getNextMondayAfter(new Date());
+function getSuggestedStartDate(callback) {
+  getLastSavedWeekStart(last => {
+    if (last) callback(getNextMondayAfter(last));
+    else callback(getNextMondayAfter(new Date()));
+  });
 }
 
 function showDatePickerModal(callback) {
-  const defaultStr = formatDateForStorage(getSuggestedStartDate());
-  const modalHtml = `
-    <div class="modal-overlay" id="datePickerModal">
-      <div class="modal-content">
-        <h3>Choose Start Date for This Week</h3>
-        <p style="margin-bottom:0.5rem; color:#4a7c5c;">Monday will be this date, Tuesday the next day, etc.</p>
-        <input type="date" id="startDateInput" value="${defaultStr}">
-        <div class="modal-actions">
-          <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
-          <button class="btn btn-primary" id="confirmModalBtn">Save</button>
+  getSuggestedStartDate(defaultDate => {
+    const defaultStr = formatDateForStorage(defaultDate);
+    const modalHtml = `
+      <div class="modal-overlay" id="datePickerModal">
+        <div class="modal-content">
+          <h3>Choose Start Date for This Week</h3>
+          <p style="margin-bottom:0.5rem; color:#4a7c5c;">Monday will be this date, Tuesday the next day, etc.</p>
+          <input type="date" id="startDateInput" value="${defaultStr}">
+          <div class="modal-actions">
+            <button class="btn btn-secondary" id="cancelModalBtn">Cancel</button>
+            <button class="btn btn-primary" id="confirmModalBtn">Save</button>
+          </div>
         </div>
-      </div>
-    </div>`;
-  document.body.insertAdjacentHTML('beforeend', modalHtml);
-  const modal = document.getElementById('datePickerModal');
-  const input = document.getElementById('startDateInput');
-  const cancelBtn = document.getElementById('cancelModalBtn');
-  const confirmBtn = document.getElementById('confirmModalBtn');
-  const closeModal = () => modal.remove();
-  cancelBtn.addEventListener('click', closeModal);
-  confirmBtn.addEventListener('click', () => {
-    const selectedDate = new Date(input.value + 'T12:00:00');
-    closeModal();
-    callback(selectedDate);
+      </div>`;
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    const modal = document.getElementById('datePickerModal');
+    const input = document.getElementById('startDateInput');
+    const cancelBtn = document.getElementById('cancelModalBtn');
+    const confirmBtn = document.getElementById('confirmModalBtn');
+    const closeModal = () => modal.remove();
+    cancelBtn.addEventListener('click', closeModal);
+    confirmBtn.addEventListener('click', () => {
+      const selectedDate = new Date(input.value + 'T12:00:00');
+      closeModal();
+      callback(selectedDate);
+    });
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
   });
-  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
 }
 
-function saveWeekToCalendar(startDate) {
-  const calendarData = JSON.parse(localStorage.getItem('realMealPlan_calendar')) || {};
+async function saveWeekToCalendar(startDate) {
+  if (!currentUser) return 0;
+  
+  // Load existing calendar plans from Firestore
+  const docRef = db.collection('users').doc(currentUser.uid).collection('data').doc('calendar');
+  const doc = await docRef.get();
+  let calendarData = {};
+  if (doc.exists) {
+    calendarData = doc.data().mealPlans || {};
+  }
+  
   let savedCount = 0;
   for (let i = 0; i < WEEKDAYS.length; i++) {
     const meal = weeklyPlan[i];
     if (!meal) continue;
+    
     const date = new Date(startDate);
     date.setDate(startDate.getDate() + i);
     const dateStr = formatDateForStorage(date);
+    
     const mainDish = meal.main === "[Blocked]" ? "" : meal.main;
     const sideDish = meal.side === "[Blocked]" ? "" : meal.side;
     const vegDish = meal.veg === "[Blocked]" ? "" : meal.veg;
+    
     if (mainDish || sideDish || vegDish) {
-      calendarData[dateStr] = { main: mainDish, side: sideDish, veg: vegDish };
+      calendarData[dateStr] = {
+        main: mainDish,
+        side: sideDish,
+        veg: vegDish
+      };
       savedCount++;
     } else {
       delete calendarData[dateStr];
     }
   }
-  localStorage.setItem('realMealPlan_calendar', JSON.stringify(calendarData));
+  
+  // Save back to Firestore
+  await docRef.set({ mealPlans: calendarData });
   setLastSavedWeekStart(startDate);
   return savedCount;
 }
 
-saveWeekToCalendarBtn.addEventListener('click', () => {
+saveWeekToCalendarBtn.addEventListener('click', async () => {
   const hasAnyMeal = weeklyPlan.some(meal => meal !== null);
   if (!hasAnyMeal) {
     saveCalendarNote.textContent = 'No meals planned yet. Generate a week first!';
@@ -867,8 +928,9 @@ saveWeekToCalendarBtn.addEventListener('click', () => {
     setTimeout(() => saveCalendarNote.textContent = '', 3000);
     return;
   }
-  showDatePickerModal(startDate => {
-    const count = saveWeekToCalendar(startDate);
+  
+  showDatePickerModal(async (startDate) => {
+    const count = await saveWeekToCalendar(startDate);
     saveCalendarNote.textContent = `Saved ${count} days to calendar starting ${startDate.toLocaleDateString()}.`;
     saveCalendarNote.style.color = '#166534';
     setTimeout(() => saveCalendarNote.textContent = '', 4000);
@@ -876,7 +938,20 @@ saveWeekToCalendarBtn.addEventListener('click', () => {
 });
 
 // --------------------------------------------------------------
-// EVENT BINDING & INIT
+// AUTH HOOK – called from auth.js when user is ready
+// --------------------------------------------------------------
+function onUserReady(userId) {
+  loadWeeklyPlanFromFirestore(() => {
+    buildTable();
+    syncTableFromPlan();
+    bindEvents();
+    updateNextFillIndex();
+    feedbackDiv.innerHTML = "Ready! Use blockers per day, set filters, then generate.";
+  });
+}
+
+// --------------------------------------------------------------
+// EVENT BINDING & INIT DISABLED (now called by onUserReady)
 // --------------------------------------------------------------
 function bindEvents() {
   generateBtn.addEventListener('click', generateAndFillNextDay);
@@ -905,14 +980,3 @@ function bindEvents() {
     });
   });
 }
-
-function init() {
-  buildTable();
-  resetWeeklyPlan();
-  bindEvents();
-  feedbackDiv.innerHTML = "Ready! Use blockers per day, set filters, then generate.";
-  filtersCard.classList.remove("show");
-  filterToggleBtn.classList.remove("open");
-}
-
-init();

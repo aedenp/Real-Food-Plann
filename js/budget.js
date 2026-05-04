@@ -4,30 +4,50 @@
 const CATEGORIES = ['Meat & Seafood', 'Produce', 'Dairy & Eggs', 'Pantry', 'Other'];
 let expenses = [];
 
-function loadExpenses() {
-  try { expenses = JSON.parse(localStorage.getItem('realMealPlan_budget')) || []; } catch(e) { expenses = []; }
+// Firestore functions (replace localStorage)
+function saveExpenses() {
+  if (!currentUser) return;
+  db.collection('users').doc(currentUser.uid).collection('data').doc('budget')
+    .set({ expenses })
+    .catch(err => console.error('Save budget failed:', err));
 }
-function saveExpenses() { localStorage.setItem('realMealPlan_budget', JSON.stringify(expenses)); }
-loadExpenses();
+
+function loadExpenses(callback) {
+  if (!currentUser) { callback(); return; }
+  db.collection('users').doc(currentUser.uid).collection('data').doc('budget')
+    .get()
+    .then(doc => {
+      if (doc.exists) {
+        expenses = doc.data().expenses || [];
+      } else {
+        expenses = [];
+      }
+      callback();
+    })
+    .catch(() => {
+      expenses = [];
+      callback();
+    });
+}
 
 // DOM elements
-const weekRangeLabel   = document.getElementById('weekRangeLabel');
-const dayStrip         = document.getElementById('dayStrip');
-const receiptDateHidden= document.getElementById('receiptDate');
-const receiptDesc      = document.getElementById('receiptDesc');
-const enableBreakdown  = document.getElementById('enableBreakdown');
-const breakdownInputs  = document.getElementById('breakdownInputs');
-const receiptTotal     = document.getElementById('receiptTotal');
-const saveReceiptBtn   = document.getElementById('saveReceiptBtn');
+const weekRangeLabel = document.getElementById('weekRangeLabel');
+const dayStrip = document.getElementById('dayStrip');
+const receiptDateHidden = document.getElementById('receiptDate');
+const receiptDesc = document.getElementById('receiptDesc');
+const enableBreakdown = document.getElementById('enableBreakdown');
+const breakdownInputs = document.getElementById('breakdownInputs');
+const receiptTotal = document.getElementById('receiptTotal');
+const saveReceiptBtn = document.getElementById('saveReceiptBtn');
 const weekAvgOverallEl = document.getElementById('weekAvgOverall');
-const monthAvgOverallEl= document.getElementById('monthAvgOverall');
-const weekFilter       = document.getElementById('weekFilter');
+const monthAvgOverallEl = document.getElementById('monthAvgOverall');
+const weekFilter = document.getElementById('weekFilter');
 const expenseTableBody = document.getElementById('expenseTableBody');
-const monthlyTotalsBody= document.getElementById('monthlyTotalsBody');
-const deleteAllBtn     = document.getElementById('deleteAllBtn');
-const prevWeekBtn      = document.getElementById('prevWeekBtn');
-const nextWeekBtn      = document.getElementById('nextWeekBtn');
-const thisWeekBtn      = document.getElementById('thisWeekBtn');
+const monthlyTotalsBody = document.getElementById('monthlyTotalsBody');
+const deleteAllBtn = document.getElementById('deleteAllBtn');
+const prevWeekBtn = document.getElementById('prevWeekBtn');
+const nextWeekBtn = document.getElementById('nextWeekBtn');
+const thisWeekBtn = document.getElementById('thisWeekBtn');
 
 let weeklyChart = null;
 let monthlyChart = null;
@@ -98,7 +118,7 @@ prevWeekBtn.addEventListener('click', () => {
   displayedWeekStart.setDate(displayedWeekStart.getDate() - 7);
   renderDayStrip();
   const sel = new Date(receiptDateHidden.value + 'T12:00:00');
-  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7*86400000)) {
+  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7 * 86400000)) {
     receiptDateHidden.value = formatDate(displayedWeekStart);
   }
 });
@@ -106,7 +126,7 @@ nextWeekBtn.addEventListener('click', () => {
   displayedWeekStart.setDate(displayedWeekStart.getDate() + 7);
   renderDayStrip();
   const sel = new Date(receiptDateHidden.value + 'T12:00:00');
-  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7*86400000)) {
+  if (sel < displayedWeekStart || sel >= new Date(displayedWeekStart.getTime() + 7 * 86400000)) {
     receiptDateHidden.value = formatDate(displayedWeekStart);
   }
 });
@@ -178,7 +198,7 @@ function clearForm() {
   document.querySelectorAll('.cat-amount').forEach(input => input.value = '');
 }
 
-window.deleteExpense = function(id) {
+window.deleteExpense = function (id) {
   expenses = expenses.filter(exp => exp.id !== id);
   saveExpenses();
   refreshAll();
@@ -210,13 +230,13 @@ function updateAverages() {
   const monthSet = new Set();
   expenses.forEach(exp => {
     const d = new Date(exp.date + 'T12:00:00');
-    monthSet.add(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+    monthSet.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
   });
   const monthCount = monthSet.size || 1;
   monthAvgOverallEl.textContent = `$${(total / monthCount).toFixed(2)}`;
 }
 
-// ---------- WEEK FILTER & TABLES ----------
+// ---------- WEEK FILTER & TABLE ----------
 function populateWeekFilter() {
   const weekSet = new Set();
   expenses.forEach(exp => {
@@ -241,7 +261,7 @@ function renderExpenseTable() {
     const monday = getMonday(new Date(exp.date + 'T12:00:00'));
     const weekLabel = formatWeekRange(monday);
     const breakdownStr = exp.breakdown ?
-      Object.entries(exp.breakdown).filter(([,v]) => v > 0).map(([cat, amt]) => `${cat}: $${amt.toFixed(2)}`).join(', ') : '—';
+      Object.entries(exp.breakdown).filter(([, v]) => v > 0).map(([cat, amt]) => `${cat}: $${amt.toFixed(2)}`).join(', ') : '—';
     return `<tr>
       <td>${exp.date}</td><td>${weekLabel}</td><td>${exp.description || '—'}</td><td>$${exp.total.toFixed(2)}</td>
       <td>${breakdownStr}</td><td><button class="clear-day-btn" onclick="deleteExpense(${exp.id})">Delete</button></td>
@@ -251,11 +271,12 @@ function renderExpenseTable() {
   renderMonthlyTotalsTable();
 }
 
+// ---------- MONTHLY TOTALS TABLE ----------
 function renderMonthlyTotalsTable() {
   const totals = {};
   expenses.forEach(exp => {
     const d = new Date(exp.date + 'T12:00:00');
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     totals[key] = (totals[key] || 0) + exp.total;
   });
   const sorted = Object.keys(totals).sort().reverse();
@@ -264,7 +285,7 @@ function renderMonthlyTotalsTable() {
   ).join('');
 }
 
-// ---------- CHARTS – shows most recent 12 weeks/months with data ----------
+// ---------- CHARTS (wait for Chart.js) ----------
 function ensureCharts() {
   if (typeof Chart === 'undefined') {
     setTimeout(ensureCharts, 100);
@@ -275,29 +296,17 @@ function ensureCharts() {
 }
 
 function updateWeeklyChart() {
-  // Collect all distinct Monday dates from expenses
-  const weekSet = new Set();
-  expenses.forEach(exp => {
-    const monday = getMonday(new Date(exp.date + 'T12:00:00'));
-    weekSet.add(formatDate(monday));
-  });
-  // Sort chronologically
-  const sortedWeeks = Array.from(weekSet).sort();
-  // Keep the last 12 weeks (most recent), or fewer if not enough
-  const recentWeeks = sortedWeeks.slice(-12);
+  const currentMonday = getMonday(new Date());
+  const labels = [], barData = [], lineData = [];
 
-  const labels = [];
-  const barData = [];
-  const lineData = [];
-
-  recentWeeks.forEach(mondayStr => {
-    const monday = new Date(mondayStr + 'T12:00:00');
-    labels.push(formatWeekRange(monday).substring(0, 6)); // e.g. "May 11"
-    const weekExpenses = getWeekExpenses(monday);
-    const total = weekExpenses.reduce((sum, exp) => sum + exp.total, 0);
+  for (let i = 11; i >= 0; i--) {
+    const monday = new Date(currentMonday);
+    monday.setDate(monday.getDate() - i * 7);
+    const total = getWeekExpenses(monday).reduce((sum, exp) => sum + exp.total, 0);
+    labels.push(formatWeekRange(monday).substring(0, 6));
     barData.push(total);
     lineData.push(total);
-  });
+  }
 
   const ctx = document.getElementById('weeklyChart').getContext('2d');
   if (weeklyChart) weeklyChart.destroy();
@@ -334,35 +343,23 @@ function updateWeeklyChart() {
 }
 
 function updateMonthlyChart() {
-  const monthSet = new Set();
-  expenses.forEach(exp => {
-    const d = new Date(exp.date + 'T12:00:00');
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
-    monthSet.add(key);
-  });
-  const sortedMonths = Array.from(monthSet).sort();
-  const recentMonths = sortedMonths.slice(-12);
-
-  const labels = [];
-  const barData = [];
-  const lineData = [];
   const totalsMap = {};
-
-  // Compute totals for all months first
   expenses.forEach(exp => {
     const d = new Date(exp.date + 'T12:00:00');
-    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     totalsMap[key] = (totalsMap[key] || 0) + exp.total;
   });
 
-  recentMonths.forEach(key => {
-    const [y, m] = key.split('-').map(Number);
-    const date = new Date(y, m-1, 1);
-    labels.push(date.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
+  const now = new Date();
+  const labels = [], barData = [], lineData = [];
+  for (let i = 11; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    labels.push(d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' }));
     const total = totalsMap[key] || 0;
     barData.push(total);
     lineData.push(total);
-  });
+  }
 
   const ctx = document.getElementById('monthlyChart').getContext('2d');
   if (monthlyChart) monthlyChart.destroy();
@@ -414,5 +411,11 @@ deleteAllBtn.addEventListener('click', () => {
   }
 });
 
-// Initial
-refreshAll();
+// --------------------------------------------------------------
+// AUTH HOOK
+// --------------------------------------------------------------
+function onUserReady(userId) {
+  loadExpenses(() => {
+    refreshAll();
+  });
+}

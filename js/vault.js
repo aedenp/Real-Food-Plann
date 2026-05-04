@@ -341,5 +341,10 @@ filterButtons.forEach(btn => {
   });
 });
 
-// Initial render
-renderDishes('all');
+// --------------------------------------------------------------
+// AUTH HOOK (required but no data to load)
+// --------------------------------------------------------------
+function onUserReady(userId) {
+  // Vault is static; just render the list
+  renderDishes('all');
+}
